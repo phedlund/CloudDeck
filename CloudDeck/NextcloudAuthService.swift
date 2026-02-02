@@ -24,6 +24,12 @@ struct NextcloudCredentials: Decodable, Equatable {
     let appPassword: String
 }
 
+struct Account {
+    let serverURL: String
+    let username: String
+    let appPassword: String
+}
+
 enum LoginError: LocalizedError {
     case invalidURL
     case serverError

@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D0BA9C892F305FC10057530C /* Valet in Frameworks */ = {isa = PBXBuildFile; productRef = D0BA9C882F305FC10057530C /* Valet */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		D0BA9BEE2F299B130057530C /* CloudDeck.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CloudDeck.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0BA9C892F305FC10057530C /* Valet in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = CloudDeck;
 			packageProductDependencies = (
+				D0BA9C882F305FC10057530C /* Valet */,
 			);
 			productName = CloudDeck;
 			productReference = D0BA9BEE2F299B130057530C /* CloudDeck.app */;
@@ -108,6 +114,7 @@
 			mainGroup = D0BA9BE52F299B130057530C;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				D0BA9C872F305FC10057530C /* XCRemoteSwiftPackageReference "Valet" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D0BA9BEF2F299B130057530C /* Products */;
@@ -368,6 +375,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D0BA9C872F305FC10057530C /* XCRemoteSwiftPackageReference "Valet" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/square/Valet";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D0BA9C882F305FC10057530C /* Valet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D0BA9C872F305FC10057530C /* XCRemoteSwiftPackageReference "Valet" */;
+			productName = Valet;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D0BA9BE62F299B130057530C /* Project object */;
 }
