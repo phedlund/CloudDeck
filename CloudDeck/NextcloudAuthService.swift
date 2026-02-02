@@ -74,7 +74,15 @@ class NextcloudAuthService {
                 // Task A: The Browser UI
                 group.addTask {
                     // This waits for the user to finish the web flow
-                    _ = try await session.authenticate(using: flow.loginURL, callbackURLScheme: "nc")
+                    _ = try await session.authenticate(
+                        using: flow.loginURL,
+                        callback: .customScheme("nc"),
+                        preferredBrowserSession: nil,
+                        additionalHeaderFields: [
+                            "User-Agent": self.userAgent,
+                            "OCS-APIRequest": "true"
+                        ]
+                    )
                     return nil // Browser finished, but polling usually provides the password
                 }
 
