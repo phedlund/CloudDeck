@@ -125,9 +125,9 @@ class NextcloudAuthService {
     private func fetchFlowInfo(serverURL: URL) async throws -> (loginURL: URL, pollEndpoint: URL, pollToken: String) {
         let flowURL = serverURL.appending(path: "/index.php/login/v2")
         var request = URLRequest(url: flowURL)
-        request.httpMethod = "POST"
-        request.addValue("true", forHTTPHeaderField: "OCS-APIRequest")
-        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
+        request.httpMethod = Method.post.rawValue
+        request.addValue("true", forHTTPHeaderField: Constants.Headers.ocsApiRequest)
+        request.setValue(userAgent, forHTTPHeaderField: Constants.Headers.userAgent)
 
         let (data, _) = try await URLSession.shared.data(for: request)
 
@@ -148,8 +148,8 @@ class NextcloudAuthService {
             var request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
             request.httpBody = "token=\(token)".data(using: .utf8)
-            request.addValue("true", forHTTPHeaderField: "OCS-APIRequest")
-            request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
+            request.addValue("true", forHTTPHeaderField:  Constants.Headers.ocsApiRequest)
+            request.setValue(userAgent, forHTTPHeaderField:  Constants.Headers.userAgent)
 
             // 1. Perform the network call
             if let (data, response) = try? await URLSession.shared.data(for: request),

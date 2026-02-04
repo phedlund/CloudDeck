@@ -9,15 +9,19 @@ import Foundation
 import SwiftUI
 
 enum Method: String {
-    case connect = "CONNECT"
-    case delete = "DELETE"
-    case get = "GET"
-    case head = "HEAD"
-    case options = "OPTIONS"
-    case patch = "PATCH"
-    case post = "POST"
-    case put = "PUT"
-    case trace = "TRACE"
+    case connect
+    case delete
+    case get
+    case head
+    case options
+    case patch
+    case post
+    case put
+    case trace
+
+    var uppercased: String {
+        return rawValue.uppercased()
+    }
 }
 
 enum Router {
@@ -26,12 +30,6 @@ enum Router {
         case stacks(boardId: Int)
         case cards(stackId: Int)
         case card(id: Int)
-
-//    let baseURL: URL
-//    let endpoint: Endpoint
-//    let method: Method
-//    let queryItems: [URLQueryItem]?
-//    let body: Data?
 
     private var method: Method {
         switch self {
@@ -65,15 +63,17 @@ enum Router {
         @AppStorage(Constants.Settings.server) var server: String = ""
 
         let baseURLString = "\(server)/index.php/apps/deck/api/v1.1"
-        let url = URL(string: baseURLString)! //FIX
+        guard let url = URL(string: baseURLString) else {
+            throw URLError(.badURL)
+        }
 
         var urlRequest = URLRequest(url: url.appendingPathComponent(path))
-        urlRequest.httpMethod = method.rawValue
+        urlRequest.httpMethod = method.uppercased
         urlRequest.cachePolicy = .reloadIgnoringLocalCacheData
         urlRequest.timeoutInterval = 20.0
         urlRequest.setValue(basicAuthHeader, forHTTPHeaderField: "Authorization")
         urlRequest.setValue("true", forHTTPHeaderField: "OCS-APIRequest")
-        urlRequest.setValue("Wed, 04 Feb 2026 00:17:06 GMT", forHTTPHeaderField: "If-Modified-Since")
+        // urlRequest.setValue("Wed, 04 Feb 2026 00:17:06 GMT", forHTTPHeaderField: "If-Modified-Since")
         urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
 
         switch self {
@@ -148,3 +148,4 @@ enum Router {
 //        )
 //    }
 //}
+
