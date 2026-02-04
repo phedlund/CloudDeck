@@ -13,7 +13,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
-                if let account = authManager.currentAccount {
+                if let account = authManager.currentAccount() {
                     Section {
                         LabeledContent("Server", value: account.serverURL)
                         LabeledContent("Username", value: account.username)
@@ -37,4 +37,8 @@ struct SettingsView: View {
             .navigationTitle("Settings")
         }
     }
+}
+
+#Preview {
+    SettingsView()
 }

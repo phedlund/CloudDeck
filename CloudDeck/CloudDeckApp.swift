@@ -12,33 +12,55 @@ import SwiftData
 struct CloudDeckApp: App {
     @State private var authManager = AuthenticationManager()
 
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+    private let container: ModelContainer
+    private let modelActor: DeckModelActor
+    private let deckAPI: DeckAPI
 
+    init() {
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            container = try ModelContainer(for: schema)
+            self.modelActor = DeckModelActor(modelContainer: container)
+            self.deckAPI = DeckAPI(modelContainer: container)
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            fatalError("Failed to create container")
         }
-    }()
+    }
 
     var body: some Scene {
         WindowGroup {
             if authManager.isAuthenticated {
-                DeckRootView()
+                ContentView()
                     .environment(authManager)
+                    .environment(deckAPI)
             } else {
-                NextcloudLoginView()
+                LoginView()
                     .environment(authManager)
             }
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(container)
     }
 }
 
-//#Preview {
-//    CloudDeckApp()
-//}
+#Preview("Authenticated") {
+    // Provide an in-memory ModelContainer for previews to avoid ambiguity
+    let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: schema, configurations: configuration)
+
+    let authManager = AuthenticationManager()
+    authManager.isAuthenticated = true
+
+    let deckAPI = DeckAPI(modelContainer: container)
+
+    return ContentView()
+        .environment(authManager)
+        .environment(deckAPI)
+        .modelContainer(container)
+}
+
+#Preview("Login") {
+    let authManager = AuthenticationManager()
+    authManager.isAuthenticated = false
+    return LoginView()
+        .environment(authManager)
+}
+

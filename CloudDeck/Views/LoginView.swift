@@ -1,5 +1,5 @@
 //
-//  NextcloudLoginView.swift
+//  LoginView.swift
 //  CloudDeck
 //
 //  Created by Peter Hedlund on 1/30/26.
@@ -8,7 +8,7 @@
 import AuthenticationServices
 import SwiftUI
 
-struct NextcloudLoginView: View {
+struct LoginView: View {
     @Environment(\.webAuthenticationSession) private var webAuthenticationSession
     @Environment(AuthenticationManager.self) private var authManager
 
@@ -131,5 +131,5 @@ struct NextcloudLoginView: View {
 }
 
 #Preview {
-    NextcloudLoginView()
+    LoginView()
 }

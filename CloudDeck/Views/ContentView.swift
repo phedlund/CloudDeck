@@ -8,23 +8,25 @@
 import SwiftData
 import SwiftUI
 
-struct DeckRootView: View {
+struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(DeckAPI.self) private var deckAPI
+    @Environment(AuthenticationManager.self) private var authManager
 
-    @State private var selectedBoard: DeckBoard?
-    @State private var selectedStack: DeckStack?
-    @State private var selectedCard: DeckCard?
+    @State private var selectedBoard: Board?
+    @State private var selectedStack: Stack?
+    @State private var selectedCard: Card?
 
     @State private var showSettings = false
 
     // MARK: Queries
 
-    @Query(filter: #Predicate<DeckBoard> { !$0.archived },
+    @Query(filter: #Predicate<Board> { !$0.archived },
            sort: \.title)
-    private var boards: [DeckBoard]
+    private var boards: [Board]
 
-    @Query private var stacks: [DeckStack]
-    @Query private var cards: [DeckCard]
+    @Query private var stacks: [Stack]
+    @Query private var cards: [Card]
 
     var body: some View {
         NavigationSplitView {
@@ -34,15 +36,23 @@ struct DeckRootView: View {
             }
             .navigationTitle("Boards")
             .refreshable {
-                let actor = DeckSyncActor(modelContainer: modelContext.container)
-                try? await actor.syncBoards()
+                Task {
+                    do {
+                        try await deckAPI.sync()
+                    } catch {
+                        //
+                    }
+                }
             }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
                         Task {
-                            let actor = DeckSyncActor(modelContainer: modelContext.container)
-                            try? await actor.syncBoards()
+                            do {
+                                try await deckAPI.sync()
+                            } catch {
+                                //
+                            }
                         }
                     } label: {
                         Image(systemName: "arrow.triangle.2.circlepath")
@@ -91,4 +101,9 @@ struct DeckRootView: View {
         }
     }
 
+}
+
+#Preview {
+    ContentView()
+        .modelContainer(for: [Board.self, Stack.self, Card.self], inMemory: true)
 }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 enum Method: String {
     case connect = "CONNECT"
@@ -19,7 +20,7 @@ enum Method: String {
     case trace = "TRACE"
 }
 
-enum DeckRouter {
+enum Router {
         case boards
         case board(id: Int)
         case stacks(boardId: Int)
@@ -34,16 +35,10 @@ enum DeckRouter {
 
     private var method: Method {
         switch self {
-//        case .feeds, .folders, .items, .updatedItems, .version, .status, .favicon:
-//            return .get
-//        case .addFeed, .addFolder, .itemsRead, .itemsUnread, .itemStarred, .itemUnstarred, .itemsStarred, .itemsUnstarred, .markFeedRead, .renameFeed, .moveFeed, .markFolderRead, .itemRead, .itemUnread, .allItemsRead:
-//            return .post
-//        case .deleteFeed, .deleteFolder:
-//            return .delete
-//        case .renameFolder:
-//            return .put
-        default:
+        case .boards:
             return .get
+        case .board, .stacks, .cards, .card:
+              return .get
         }
     }
 
@@ -67,8 +62,9 @@ enum DeckRouter {
     }
 
     func urlRequest() throws -> URLRequest {
-        let server = UserDefaults.standard.string(forKey: "serverURL")
-        let baseURLString = "\(String(describing: server))/index.php/apps/deck/api/v1.0"
+        @AppStorage(Constants.Settings.server) var server: String = ""
+
+        let baseURLString = "\(server)/index.php/apps/deck/api/v1.1"
         let url = URL(string: baseURLString)! //FIX
 
         var urlRequest = URLRequest(url: url.appendingPathComponent(path))
@@ -76,14 +72,24 @@ enum DeckRouter {
         urlRequest.cachePolicy = .reloadIgnoringLocalCacheData
         urlRequest.timeoutInterval = 20.0
         urlRequest.setValue(basicAuthHeader, forHTTPHeaderField: "Authorization")
+        urlRequest.setValue("true", forHTTPHeaderField: "OCS-APIRequest")
+        urlRequest.setValue("Wed, 04 Feb 2026 00:17:06 GMT", forHTTPHeaderField: "If-Modified-Since")
         urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
 
         switch self {
-            //                case .folders, .feeds:
-        default:
-            URLRequest(url: url)
+        case .boards:
+            break
+        case .board(let id):
+            break
+        case .stacks(let boardId):
+            break
+        case .cards(let stackId):
+            break
+        case .card(let id):
+            break
         }
-        return urlRequest
+
+            return urlRequest
     }
 //    func asURLRequest(
 //        username: String,

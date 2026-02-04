@@ -10,13 +10,13 @@ import Valet
 
 class ValetManager {
     static let shared = ValetManager()
-    let valet = Valet.valet(with: Identifier(nonEmpty: "CloudNews")!, accessibility: .afterFirstUnlock)
+    let valet = Valet.valet(with: Identifier(nonEmpty: Constants.productName)!, accessibility: .afterFirstUnlock)
 
     init() { }
 
     func saveCredentials(username: String, password: String) throws {
-        try valet.setString(username, forKey: SettingKeys.username)
-        try valet.setString(password, forKey:  SettingKeys.password)
+        try valet.setString(username, forKey: Constants.Settings.username)
+        try valet.setString(password, forKey:  Constants.Settings.password)
     }
 
     func logOut() {
@@ -29,8 +29,8 @@ class ValetManager {
 
     private var credentials: String? {
         do {
-            let username = try valet.string(forKey: SettingKeys.username)
-            let password = try valet.string(forKey: SettingKeys.password)
+            let username = try valet.string(forKey: Constants.Settings.username)
+            let password = try valet.string(forKey: Constants.Settings.password)
             return Data("\(username):\(password)".utf8).base64EncodedString()
         } catch {
             print(error.localizedDescription)

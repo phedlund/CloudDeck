@@ -8,14 +8,14 @@
 
 import SwiftUI
 import SwiftData
+import Valet
 
 @Observable
 @MainActor
 class AuthenticationManager {
-    @ObservationIgnored @AppStorage(SettingKeys.server) var server = ""
+    @ObservationIgnored @AppStorage(Constants.Settings.server) var server = ""
 
     var isAuthenticated = false
-    var currentAccount: Account?
 
     init() {
         checkAuthentication()
@@ -29,31 +29,34 @@ class AuthenticationManager {
         }
     }
 
+    func currentAccount() -> Account? {
+        if server.isEmpty || ValetManager.shared.basicAuthHeader.isEmpty {
+            return nil
+        }
+        if let username = try? ValetManager.shared.valet.string(forKey: Constants.Settings.username), let password = try? ValetManager.shared.valet.string(forKey: Constants.Settings.password) {
+            return Account(
+                serverURL: server,
+                username: username,
+                appPassword: password
+            )
+        }
+        return nil
+    }
+
     func login(credentials: NextcloudCredentials) {
         // Save credentials
         server = credentials.server
         do {
             try ValetManager.shared.saveCredentials(username: credentials.loginName, password: credentials.appPassword)
+            isAuthenticated = true
         } catch {
-            //
+            isAuthenticated = false
         }
-
-        currentAccount = Account(
-            serverURL: credentials.server,
-            username: credentials.loginName,
-            appPassword: credentials.appPassword
-        )
-
-        isAuthenticated = true
     }
 
     func logout() {
-//        guard let account = currentAccount else { return }
-
         ValetManager.shared.logOut()
         server = ""
-
-        currentAccount = nil
         isAuthenticated = false
     }
 }

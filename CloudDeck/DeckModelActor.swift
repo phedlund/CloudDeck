@@ -8,57 +8,32 @@
 import SwiftData
 import Foundation
 
+public let schema = Schema([
+    Board.self,
+    Stack.self,
+    Card.self
+])
+
 @ModelActor
-actor DeckSyncActor {
+actor DeckModelActor: Sendable {
 
     private var modelContext: ModelContext { modelExecutor.modelContext }
 
-    // MARK: - Boards
-
-    func syncBoards() async throws {
-//        let remoteBoards = try await DeckAPI.fetchBoards()
-//
-//        for board in remoteBoards {
-//            upsert(board)
-//        }
-//
-//        try modelContext.save()
-    }
-
-    // MARK: - Stacks
-
-    func syncStacks(boardId: Int) async throws {
-        let remoteStacks = try await DeckAPI.fetchStacks(boardId: boardId)
-
-        for stack in remoteStacks {
-            upsert(stack)
-        }
-
+    func save() async throws {
         try modelContext.save()
     }
 
-    // MARK: - Cards
-
-    func syncCards(stackId: Int) async throws {
-        let remoteCards = try await DeckAPI.fetchCards(stackId: stackId)
-
-        for card in remoteCards {
-            upsert(card)
-        }
-
-        try modelContext.save()
-    }
 }
 
-extension DeckSyncActor {
+extension DeckModelActor {
 
-    private func upsert(_ dto: DeckBoardDTO) {
+    func upsert(_ dto: BoardDTO) {
         if let existing = fetchBoard(id: dto.id) {
             existing.title = dto.title
             existing.archived = dto.archived ?? false
         } else {
             modelContext.insert(
-                DeckBoard(
+                Board(
                     id: dto.id,
                     title: dto.title,
                     archived: dto.archived ?? false
@@ -67,13 +42,13 @@ extension DeckSyncActor {
         }
     }
 
-    private func upsert(_ dto: DeckStackDTO) {
+    private func upsert(_ dto: StackDTO) {
         if let existing = fetchStack(id: dto.id) {
             existing.title = dto.title
             existing.boardId = dto.boardId
         } else {
             modelContext.insert(
-                DeckStack(
+                Stack(
                     id: dto.id,
                     title: dto.title,
                     boardId: dto.boardId
@@ -82,7 +57,7 @@ extension DeckSyncActor {
         }
     }
 
-    private func upsert(_ dto: DeckCardDTO) {
+    private func upsert(_ dto: CardDTO) {
         if let existing = fetchCard(id: dto.id) {
             existing.title = dto.title
             existing.cardDescription = dto.description
@@ -90,7 +65,7 @@ extension DeckSyncActor {
             existing.order = dto.order ?? 0
         } else {
             modelContext.insert(
-                DeckCard(
+                Card(
                     id: dto.id,
                     title: dto.title,
                     description: dto.description,
@@ -101,28 +76,28 @@ extension DeckSyncActor {
         }
     }
 }
-extension DeckSyncActor {
+extension DeckModelActor {
 
     // MARK: - Fetch helpers
 
-    private func fetchBoard(id: Int) -> DeckBoard? {
-        let descriptor = FetchDescriptor<DeckBoard>(
+    private func fetchBoard(id: Int) -> Board? {
+        let descriptor = FetchDescriptor<Board>(
             predicate: #Predicate { $0.id == id },
             sortBy: []
         )
         return try? modelContext.fetch(descriptor).first
     }
 
-    private func fetchStack(id: Int) -> DeckStack? {
-        let descriptor = FetchDescriptor<DeckStack>(
+    private func fetchStack(id: Int) -> Stack? {
+        let descriptor = FetchDescriptor<Stack>(
             predicate: #Predicate { $0.id == id },
             sortBy: []
         )
         return try? modelContext.fetch(descriptor).first
     }
 
-    private func fetchCard(id: Int) -> DeckCard? {
-        let descriptor = FetchDescriptor<DeckCard>(
+    private func fetchCard(id: Int) -> Card? {
+        let descriptor = FetchDescriptor<Card>(
             predicate: #Predicate { $0.id == id },
             sortBy: []
         )
