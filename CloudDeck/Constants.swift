@@ -49,5 +49,6 @@ struct Constants {
         //    static let syncOnStart = "SyncOnStart"
             static let username = "username"
         //    static let hasWidgets = "HasWidgets"
+        static let etag = "etag"
     }
 }

@@ -16,7 +16,7 @@ struct SyncRequests {
 
 @Observable
 final class DeckAPI {
-
+    
 
 //    Sun, 03 Aug 2019 10:34:12 GMT
 
@@ -50,7 +50,8 @@ final class DeckAPI {
 //        let hasItems = await backgroundActor.hasItems()
 //        let currentStatus = try await newsStatus()
 //        if hasItems && lastModified > 0 {
-            try await syncBoards()
+        let boardIDs = try await syncBoards()
+        try await syncStacks(boardIDs: boardIDs)
 //        } else {
 //            try await initialSync()
 //            if !hasItems {
@@ -63,29 +64,30 @@ final class DeckAPI {
 //        return currentStatus
     }
 
-    private func syncBoards() async throws {
+    private func syncBoards() async throws -> [Int] {
+        var result = [Int]()
         let requests = try await syncRequests()
         let (data, response) = try await URLSession.shared.data(for: requests.boardRequest)
         if let response = response as? HTTPURLResponse {
             switch response.statusCode {
             case 200:
-                let headers = response.allHeaderFields
-                for header in headers {
-                    print("\(header.key): \(header.value)")
+//                let headers = response.allHeaderFields
+//                for header in headers {
+//                    print("\(header.key): \(header.value)")
+//                }
+                if let etag = response.value(forHTTPHeaderField: Constants.Settings.etag) {
+                    UserDefaults.standard.set(etag, forKey: Constants.Settings.etag)
                 }
 
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategy = .secondsSince1970
-                guard let decodedResponse = try? decoder.decode([BoardDTO].self, from: data) else {
-                    //                    throw NetworkError.generic(message: "Unable to decode")
-                    return
+                if let deckBoardDTOs = try? decoder.decode([BoardDTO].self, from: data) {
+                    for deckBoardDTO in deckBoardDTOs  {
+                        await backgroundActor.upsert(deckBoardDTO)
+                    }
+                    try? await backgroundActor.save()
+                    result = deckBoardDTOs.map((\.id))
                 }
-                for deckBoardDTO in decodedResponse  {
-                    await backgroundActor.upsert(deckBoardDTO)
-                }
-                try? await backgroundActor.save()
-
-                break
             case 304:
                 print("304")
             case 401:
@@ -94,102 +96,40 @@ final class DeckAPI {
                 print("unknown status code: \(response.statusCode)")
             }
         }
+        return result
+    }
 
-//        try await backgroundActor.save(boardsResponse)
+    private func syncStacks(boardIDs: [Int]) async throws {
+        for boardId in boardIDs {
+            let (data, response) = try await URLSession.shared.data(for: Router.stacks(boardId: boardId).urlRequest())
+            if let response = response as? HTTPURLResponse {
+                switch response.statusCode {
+                case 200:
+                    let headers = response.allHeaderFields
+                    for header in headers {
+                        print("\(header.key): \(header.value)")
+                    }
+
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .secondsSince1970
+                    if let deckStackDTOs = try? decoder.decode([StackDTO].self, from: data) {
+                        for deckStackDTO in deckStackDTOs  {
+                            await backgroundActor.upsert(deckStackDTO)
+                        }
+                        try? await backgroundActor.save()
+                    }
+                case 304:
+                    print("304")
+                case 401:
+                    print("401")
+                default:
+                    print("unknown status code: \(response.statusCode)")
+                }
+            }
+        }
     }
 
     private func repeatSync() async throws {
-//        var localReadIds = [Int64]()
-//        let identifiers = try await backgroundActor.allModelIds(FetchDescriptor<Read>())
-//        for identifier in identifiers {
-//            if let itemId = try await backgroundActor.fetchItemId(by: identifier) {
-//                localReadIds.append(itemId)
-//            }
-//        }
-//
-//        if !localReadIds.isEmpty {
-//            let readParameters = ["items": localReadIds]
-//            let readRouter = Router.itemsRead(parameters: readParameters)
-//            async let (_, readResponse) = URLSession.shared.data(for: readRouter.urlRequest(), delegate: nil)
-//            let readItemsResponse = try await readResponse
-//            if let httpReadResponse = readItemsResponse as? HTTPURLResponse {
-//                switch httpReadResponse.statusCode {
-//                case 200:
-//                    try await backgroundActor.delete(model: Read.self)
-//                default:
-//                    break
-//                }
-//            }
-//        }
-//
-//        var localUnreadIds = [Int64]()
-//        let unreadIdentifiers = try await backgroundActor.allModelIds(FetchDescriptor<Unread>())
-//        for identifier in unreadIdentifiers {
-//            if let itemId = try await backgroundActor.fetchItemId(by: identifier) {
-//                localUnreadIds.append(itemId)
-//            }
-//        }
-//
-//        if !localUnreadIds.isEmpty {
-//            let unreadParameters = ["itemIds": localUnreadIds]
-//            let unreadRouter = Router.itemsUnread(parameters: unreadParameters)
-//            async let (_, unreadResponse) = URLSession.shared.data(for: unreadRouter.urlRequest(), delegate: nil)
-//            let unreadItemsResponse = try await unreadResponse
-//            if let httpUnreadResponse = unreadItemsResponse as? HTTPURLResponse {
-//                switch httpUnreadResponse.statusCode {
-//                case 200:
-//                    try await backgroundActor.delete(model: Unread.self)
-//                default:
-//                    break
-//                }
-//            }
-//        }
-//
-//        var localStarredIds = [Int64]()
-//        let starredIdentifiers = try await backgroundActor.allModelIds(FetchDescriptor<Starred>())
-//        for identifier in starredIdentifiers {
-//            if let itemId = try await backgroundActor.fetchItemId(by: identifier) {
-//                localStarredIds.append(itemId)
-//            }
-//        }
-//
-//        if !localStarredIds.isEmpty {
-//            let starredParameters = ["itemIds": localStarredIds]
-//            let starredRouter = Router.itemsStarred(parameters: starredParameters)
-//            async let (_, starredResponse) = URLSession.shared.data(for: starredRouter.urlRequest(), delegate: nil)
-//            let starredItemsResponse = try await starredResponse
-//            if let httpStarredResponse = starredItemsResponse as? HTTPURLResponse {
-//                switch httpStarredResponse.statusCode {
-//                case 200:
-//                    try await backgroundActor.delete(model: Starred.self)
-//                default:
-//                    break
-//                }
-//            }
-//        }
-//
-//        var localUnstarredIds = [Int64]()
-//        let unStarredIdentifiers = try await backgroundActor.allModelIds(FetchDescriptor<Unstarred>())
-//        for identifier in unStarredIdentifiers {
-//            if let itemId = try await backgroundActor.fetchItemId(by: identifier) {
-//                localUnstarredIds.append(itemId)
-//            }
-//        }
-//
-//        if !localUnstarredIds.isEmpty {
-//            let unstarredParameters = ["itemIds": localUnstarredIds]
-//            let unstarredRouter = Router.itemsStarred(parameters: unstarredParameters)
-//            async let (_, unstarredResponse) = URLSession.shared.data(for: unstarredRouter.urlRequest(), delegate: nil)
-//            let unstarredItemsResponse = try await unstarredResponse
-//            if let httpUnstarredResponse = unstarredItemsResponse as? HTTPURLResponse {
-//                switch httpUnstarredResponse.statusCode {
-//                case 200:
-//                    try await backgroundActor.delete(model: Unstarred.self)
-//                default:
-//                    break
-//                }
-//            }
-//        }
 
         let syncRequests = try await syncRequests()
 

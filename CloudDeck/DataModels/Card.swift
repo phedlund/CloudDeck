@@ -8,24 +8,15 @@
 import Foundation
 import SwiftData
 
-struct CardDTO: Decodable, Identifiable, Equatable {
+struct CardDTO: Codable, Identifiable {
     let id: Int
     let title: String
-    let description: String?
+    let description: String
     let stackId: Int
-    let order: Int?
-    let archived: Bool?
-    let dueDate: Date?
-
-    enum CodingKeys: String, CodingKey {
-        case id
-        case title
-        case description
-        case stackId = "stack_id"
-        case order
-        case archived
-        case dueDate = "duedate"
-    }
+    let order: Int
+    let archived: Bool
+    let deletedAt: Int
+    let lastModified: Int
 }
 
 @Model
@@ -36,6 +27,8 @@ final class Card {
     var stackId: Int
     var order: Int
 
+    var stack: Stack?
+    
     init(
         id: Int,
         title: String,
@@ -49,4 +42,18 @@ final class Card {
         self.stackId = stackId
         self.order = order
     }
+}
+
+extension Card {
+    convenience init(dto: CardDTO) {
+
+        self.init(
+            id: dto.id,
+            title: dto.title,
+            description: dto.description,
+            stackId: dto.stackId,
+            order: dto.order
+        )
+    }
+
 }

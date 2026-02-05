@@ -28,33 +28,15 @@ actor DeckModelActor: Sendable {
 extension DeckModelActor {
 
     func upsert(_ dto: BoardDTO) {
-        if let existing = fetchBoard(id: dto.id) {
-            existing.title = dto.title
-            existing.archived = dto.archived ?? false
-        } else {
-            modelContext.insert(
-                Board(
-                    id: dto.id,
-                    title: dto.title,
-                    archived: dto.archived ?? false
-                )
-            )
-        }
+        modelContext.insert(
+            Board(dto: dto)
+        )
     }
 
-    private func upsert(_ dto: StackDTO) {
-        if let existing = fetchStack(id: dto.id) {
-            existing.title = dto.title
-            existing.boardId = dto.boardId
-        } else {
-            modelContext.insert(
-                Stack(
-                    id: dto.id,
-                    title: dto.title,
-                    boardId: dto.boardId
-                )
-            )
-        }
+    func upsert(_ dto: StackDTO) {
+        modelContext.insert(
+            Stack(dto: dto)
+        )
     }
 
     private func upsert(_ dto: CardDTO) {
@@ -62,7 +44,7 @@ extension DeckModelActor {
             existing.title = dto.title
             existing.cardDescription = dto.description
             existing.stackId = dto.stackId
-            existing.order = dto.order ?? 0
+            existing.order = dto.order
         } else {
             modelContext.insert(
                 Card(
@@ -70,7 +52,7 @@ extension DeckModelActor {
                     title: dto.title,
                     description: dto.description,
                     stackId: dto.stackId,
-                    order: dto.order ?? 0
+                    order: dto.order
                 )
             )
         }

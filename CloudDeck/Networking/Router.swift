@@ -30,7 +30,7 @@ enum Router {
     case stacks(boardId: Int)
     case cards(stackId: Int)
     case card(id: Int)
-    
+
     private var method: Method {
         switch self {
         case .boards:
@@ -39,7 +39,7 @@ enum Router {
             return .get
         }
     }
-    
+
     private var path: String {
         switch self {
         case .boards:
@@ -54,28 +54,31 @@ enum Router {
             "/cards/\(id)"
         }
     }
-    
+
     private var basicAuthHeader: String {
         return ValetManager.shared.basicAuthHeader
     }
-    
+
     func urlRequest() throws -> URLRequest {
         @AppStorage(Constants.Settings.server) var server: String = ""
-        
+        @AppStorage(Constants.Settings.etag) var etag: String = ""
+
         let baseURLString = "\(server)/index.php/apps/deck/api/v1.1"
         guard let url = URL(string: baseURLString) else {
             throw URLError(.badURL)
         }
-        
+
         var urlRequest = URLRequest(url: url.appendingPathComponent(path))
         urlRequest.httpMethod = method.uppercased
         urlRequest.cachePolicy = .reloadIgnoringLocalCacheData
         urlRequest.timeoutInterval = 20.0
-        urlRequest.setValue(basicAuthHeader, forHTTPHeaderField: "Authorization")
-        urlRequest.setValue("true", forHTTPHeaderField: "OCS-APIRequest")
+        urlRequest.setValue(basicAuthHeader, forHTTPHeaderField: Constants.Headers.authorization)
+        urlRequest.setValue("true", forHTTPHeaderField: Constants.Headers.ocsApiRequest)
         // urlRequest.setValue("Wed, 04 Feb 2026 00:17:06 GMT", forHTTPHeaderField: "If-Modified-Since")
-        urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
-        
+        print(etag)
+        urlRequest.setValue(etag, forHTTPHeaderField: Constants.Settings.etag)
+        urlRequest.setValue("application/json", forHTTPHeaderField: Constants.Headers.accept)
+
         switch self {
         case .boards:
             break
@@ -88,7 +91,7 @@ enum Router {
         case .card(let id):
             break
         }
-        
+
         return urlRequest
     }
 }
