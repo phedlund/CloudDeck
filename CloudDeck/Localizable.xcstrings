@@ -1,13 +1,22 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "Account" : {
 
     },
     "Actions" : {
 
     },
+    "Assigned Users" : {
+
+    },
     "Boards" : {
+
+    },
+    "Card not found" : {
 
     },
     "card_count" : {
@@ -39,13 +48,34 @@
         }
       }
     },
+    "cardDoneToggle" : {
+      "comment" : "Mark card done",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
     "Connect to Nextcloud" : {
+
+    },
+    "Description" : {
+
+    },
+    "Due Date" : {
 
     },
     "Enter your Nextcloud server address" : {
 
     },
     "Log Out" : {
+
+    },
+    "Owner" : {
 
     },
     "Server" : {
@@ -57,7 +87,16 @@
     "Settings" : {
 
     },
+    "Status" : {
+
+    },
+    "Tags" : {
+
+    },
     "This will remove your account from this device. Your data on the server will not be affected." : {
+
+    },
+    "Title" : {
 
     },
     "Username" : {

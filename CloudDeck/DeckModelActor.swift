@@ -11,7 +11,10 @@ import Foundation
 public let schema = Schema([
     Board.self,
     Stack.self,
-    Card.self
+    Card.self,
+    DeckLabel.self,
+    User.self,
+    AssignedUser.self
 ])
 
 @ModelActor
@@ -52,7 +55,8 @@ extension DeckModelActor {
                     title: dto.title,
                     description: dto.description,
                     stackId: dto.stackId,
-                    order: dto.order
+                    order: dto.order,
+                    owner: .init(dto: dto.owner)
                 )
             )
         }

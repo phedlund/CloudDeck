@@ -8,13 +8,18 @@
 import SwiftUI
 import SwiftData
 
+struct SheetItem: Identifiable {
+    let id: Int
+}
+
 struct CardsColumnView: View {
     let stackID: Int?
+    @State private var activeSheet: SheetItem?
 
     @Query private var cards: [Card]
     @Query private var stacks: [Stack]
 
-    init(stackID: Int?) {
+    init(stackID: Int?, selectedCardID: Binding<Int?>) {
         self.stackID = stackID
 
         if let stackID {
@@ -32,17 +37,19 @@ struct CardsColumnView: View {
 
     var body: some View {
         List(cards) { card in
-            VStack(alignment: .leading) {
-                Text(card.title)
-                    .font(.headline)
-
-                if let desc = card.cardDescription, !desc.isEmpty {
-                    Text(desc)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+            CardRow(card: card)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    activeSheet = SheetItem(id: card.id)
                 }
-            }
         }
         .navigationTitle(stackTitle)
+        .sheet(item: $activeSheet) {
+            CardDetailSheet(cardID: $0.id)
+        }
     }
+}
+
+extension Int: @retroactive Identifiable {
+    public var id: Self { self }
 }

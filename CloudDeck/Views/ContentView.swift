@@ -32,7 +32,7 @@ struct ContentView: View {
                     selectedStackID: $selectedStackID
                 )
             } detail: {
-                CardsColumnView(stackID: selectedStackID)
+                CardsColumnView(stackID: selectedStackID, selectedCardID: .constant(nil))
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
