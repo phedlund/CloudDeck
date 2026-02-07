@@ -14,9 +14,22 @@
 		D0BA9BEE2F299B130057530C /* CloudDeck.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CloudDeck.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D0BA9C422F2EEF8F0057530C /* Exceptions for "CloudDeck" folder in "CloudDeck" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D0BA9BED2F299B130057530C /* CloudDeck */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D0BA9BF02F299B130057530C /* CloudDeck */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D0BA9C422F2EEF8F0057530C /* Exceptions for "CloudDeck" folder in "CloudDeck" target */,
+			);
 			path = CloudDeck;
 			sourceTree = "<group>";
 		};

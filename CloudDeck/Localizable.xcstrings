@@ -1,0 +1,101 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "Account" : {
+
+    },
+    "Actions" : {
+
+    },
+    "Assigned Users" : {
+
+    },
+    "Boards" : {
+
+    },
+    "Card not found" : {
+
+    },
+    "card_count" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld card"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld cards"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "No cards"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "cardDoneToggle" : {
+      "comment" : "Mark card done",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "Clear Date" : {
+
+    },
+    "Connect to Nextcloud" : {
+
+    },
+    "Description" : {
+
+    },
+    "Enter your Nextcloud server address" : {
+
+    },
+    "Log Out" : {
+
+    },
+    "Owner" : {
+
+    },
+    "Select" : {
+
+    },
+    "Server" : {
+
+    },
+    "Server Address" : {
+      "comment" : "Label for text field."
+    },
+    "Settings" : {
+
+    },
+    "This will remove your account from this device. Your data on the server will not be affected." : {
+
+    },
+    "Username" : {
+
+    }
+  },
+  "version" : "1.1"
+}
