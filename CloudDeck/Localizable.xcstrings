@@ -60,13 +60,13 @@
         }
       }
     },
+    "Clear Date" : {
+
+    },
     "Connect to Nextcloud" : {
 
     },
     "Description" : {
-
-    },
-    "Due Date" : {
 
     },
     "Enter your Nextcloud server address" : {
@@ -78,6 +78,9 @@
     "Owner" : {
 
     },
+    "Select" : {
+
+    },
     "Server" : {
 
     },
@@ -87,16 +90,7 @@
     "Settings" : {
 
     },
-    "Status" : {
-
-    },
-    "Tags" : {
-
-    },
     "This will remove your account from this device. Your data on the server will not be affected." : {
-
-    },
-    "Title" : {
 
     },
     "Username" : {

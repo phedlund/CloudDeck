@@ -13,11 +13,6 @@ struct CardDetailView: View {
 
     var body: some View {
         Form {
-            Section {
-                TextField("Title", text: $card.title)
-                    .font(.headline)
-            }
-
             Section("Description") {
                 TextEditor(text: Binding(
                     get: { card.cardDescription ?? "" },
@@ -26,34 +21,25 @@ struct CardDetailView: View {
                 .frame(minHeight: 120)
             }
 
-            Section("Status") {
-                Toggle(.cardDoneToggle, isOn: $card.done)
+            Section {
+                Label {
+                    Toggle("", isOn: $card.done)
+                } icon: {
+                    Image(systemName: "checkmark")
+                }
             }
 
-            //                Section("Assignment") {
-            //                    if let assignee = card. {
-            //                        Text(assignee)
-            //                    } else {
-            //                        Text(.unassigned)
-            //                            .foregroundStyle(.secondary)
-            //                    }
-            //                }
-
-            Section("Due Date") {
-                DatePicker(
-                    "",
-                    selection: Binding(
-                        get: { card.duedate ?? Date() },
-                        set: { card.duedate = $0 }
-                    ),
-                    displayedComponents: .date
-                )
-                .labelsHidden()
+            Section {
+                TaskDatePicker(date: $card.duedate)
             }
 
             if !$card.labels.isEmpty {
-                Section("Tags") {
-                    TagFlowView(tags: card.labels)
+                Section {
+                    Label {
+                        TagFlowView(tags: card.labels)
+                    } icon: {
+                        Image(systemName: "tag")
+                    }
                 }
             }
             if !$card.assignedUsers.isEmpty {
@@ -69,7 +55,7 @@ struct CardDetailView: View {
             }
 
         }
-        .navigationTitle(card.title)
+        .navigationTitle($card.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

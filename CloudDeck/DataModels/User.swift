@@ -52,7 +52,7 @@ extension User {
 
 @Model
 final class AssignedUser: Identifiable {
-    var id: Int
+    @Attribute(.unique) var id: Int
     var cardId: Int
     var type: Int
 
