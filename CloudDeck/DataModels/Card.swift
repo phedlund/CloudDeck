@@ -33,7 +33,7 @@ final class Card {
     var order: Int
     var done: Bool
     var duedate: Date?
-
+    var deletedAt: Int
     var stack: Stack?
 
     @Relationship(deleteRule: .noAction, inverse: \DeckLabel.card)
@@ -52,6 +52,7 @@ final class Card {
         labels: [DeckLabel] = [],
         done: Bool? = nil,
         duedate: Date? = nil,
+        deletedAt: Int,
         owner: User,
         assignedUsers: [AssignedUser] = []
     ) {
@@ -63,6 +64,7 @@ final class Card {
         self.labels = labels
         self.done = done ?? false
         self.duedate = duedate
+        self.deletedAt = deletedAt
         self.owner = owner
         self.assignedUsers = assignedUsers
     }
@@ -88,6 +90,7 @@ extension Card {
             labels: labelModels,
             done: dto.done,
             duedate: cardDueDate,
+            deletedAt: dto.deletedAt,
             owner: .init(dto: dto.owner),
             assignedUsers: assignedUsers
         )

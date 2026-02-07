@@ -36,31 +36,68 @@ extension DeckModelActor {
         )
     }
 
-    func upsert(_ dto: StackDTO) {
-        modelContext.insert(
-            Stack(dto: dto)
-        )
+    func apply(stackDTOs: [StackDTO], boardID: Int) throws {
+
+        var serverStackIDs = Set<Int>()
+
+        for stackDTO in stackDTOs {
+            serverStackIDs.insert(stackDTO.id)
+            modelContext.insert(Stack(dto: stackDTO))
+
+            try reconcileCards(stackID: stackDTO.id, cardDTOs: stackDTO.cards ?? [])
+        }
+
+        try deleteMissingStacks(boardID: boardID, keep: serverStackIDs)
+        try modelContext.save()
     }
 
-    private func upsert(_ dto: CardDTO) {
-        if let existing = fetchCard(id: dto.id) {
-            existing.title = dto.title
-            existing.cardDescription = dto.description
-            existing.stackId = dto.stackId
-            existing.order = dto.order
-        } else {
-            modelContext.insert(
-                Card(
-                    id: dto.id,
-                    title: dto.title,
-                    description: dto.description,
-                    stackId: dto.stackId,
-                    order: dto.order,
-                    owner: .init(dto: dto.owner)
-                )
-            )
+    private func reconcileCards(stackID: Int, cardDTOs: [CardDTO]) throws {
+
+        var serverIDs = Set<Int>()
+
+        for dto in cardDTOs {
+
+            serverIDs.insert(dto.id)
+            if dto.deletedAt != 0 {
+                try deleteCardIfExists(dto.id)
+                continue
+            }
+        }
+
+        let descriptor = FetchDescriptor<Card>(
+            predicate: #Predicate { $0.stackId == stackID }
+        )
+
+        let locals = try modelContext.fetch(descriptor)
+
+        for local in locals where !serverIDs.contains(local.id) {
+            modelContext.delete(local)
         }
     }
+
+    private func deleteMissingStacks(boardID: Int, keep serverIDs: Set<Int>) throws {
+
+        let descriptor = FetchDescriptor<Stack>(
+            predicate: #Predicate { $0.boardId == boardID }
+        )
+
+        let locals = try modelContext.fetch(descriptor)
+
+        for stack in locals where !serverIDs.contains(stack.id) {
+            modelContext.delete(stack)
+        }
+    }
+
+    private func deleteCardIfExists(_ id: Int) throws {
+        let descriptor = FetchDescriptor<Card>(
+            predicate: #Predicate { $0.id == id }
+        )
+
+        if let existing = try modelContext.fetch(descriptor).first {
+            modelContext.delete(existing)
+        }
+    }
+
 }
 extension DeckModelActor {
 

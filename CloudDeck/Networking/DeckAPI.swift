@@ -113,9 +113,7 @@ final class DeckAPI {
                     let decoder = JSONDecoder()
                     decoder.dateDecodingStrategy = .secondsSince1970
                     if let deckStackDTOs = try? decoder.decode([StackDTO].self, from: data) {
-                        for deckStackDTO in deckStackDTOs  {
-                            await backgroundActor.upsert(deckStackDTO)
-                        }
+                        try await backgroundActor.apply(stackDTOs: deckStackDTOs, boardID: boardId)
                         try? await backgroundActor.save()
                     }
                 case 304:
