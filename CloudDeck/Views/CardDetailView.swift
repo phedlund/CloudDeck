@@ -43,9 +43,10 @@ struct CardDetailView: View {
                                     }
                                 }
                             }
-                        ))                                } icon: {
-                            Image(systemName: "checkmark")
-                        }
+                        ))
+                    } icon: {
+                        Image(systemName: "checkmark")
+                    }
                 }
 
                 Section {
@@ -84,6 +85,16 @@ struct CardDetailView: View {
                         dismiss()
                     }
                 }
+            }
+            .onChange(of: card.dueDate, initial: false) { oldValue, newValue in
+                Task {
+                    do {
+                        try await deckAPI.setCardDueDate(card: card, dueDate: newValue)
+                    } catch {
+                        // handle error / revert UI if you want
+                    }
+                }
+
             }
         }
         .background(.background.secondary)

@@ -78,6 +78,7 @@ enum Router {
                 "owner": owner,
                 "order": order,
                 "archived": archived,
+                "duedate": duedate,
                 "done": done
             ]
 
