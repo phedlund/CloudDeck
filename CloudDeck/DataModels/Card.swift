@@ -13,15 +13,38 @@ struct CardDTO: Codable, Identifiable {
     let title: String
     let description: String
     let stackId: Int
+    let type: String
     let order: Int
     let archived: Bool
-    let deletedAt: Int
-    let lastModified: Int
     let labels: [LabelDTO]
-    let done: Bool?
-    let duedate: String?
     let owner: UserDTO
     let assignedUsers: [AssignedUserDTO]
+
+    let lastModified: Int
+    let createdAt: Int
+    let deletedAt: Int
+
+    let done: String?
+    let duedate: String?
+}
+
+extension CardDTO {
+
+    var createdDate: Date {
+        Date(timeIntervalSince1970: TimeInterval(createdAt))
+    }
+
+    var modifiedDate: Date {
+        Date(timeIntervalSince1970: TimeInterval(lastModified))
+    }
+
+    func parsedDone(using iso: ISO8601DateFormatter) -> Date? {
+        done.flatMap { iso.date(from: $0) }
+    }
+
+    func parsedDue(using iso: ISO8601DateFormatter) -> Date? {
+        duedate.flatMap { iso.date(from: $0) }
+    }
 }
 
 @Model
@@ -30,10 +53,15 @@ final class Card {
     var title: String
     var cardDescription: String?
     var stackId: Int
+    var type: String
     var order: Int
-    var done: Bool
-    var duedate: Date?
-    var deletedAt: Int
+    var archived: Bool
+    var createdAt: Date
+    var lastModified: Date
+    var dueDate: Date?
+    var doneAt: Date?
+    var deletedAt: Date?
+
     var stack: Stack?
 
     @Relationship(deleteRule: .noAction, inverse: \DeckLabel.card)
@@ -43,16 +71,21 @@ final class Card {
     @Relationship(deleteRule: .noAction, inverse: \AssignedUser.card)
     var assignedUsers: [AssignedUser]
 
+
     init(
         id: Int,
         title: String,
         description: String?,
         stackId: Int,
+        type: String,
         order: Int,
+        archived: Bool,
         labels: [DeckLabel] = [],
-        done: Bool? = nil,
-        duedate: Date? = nil,
-        deletedAt: Int,
+        createdAt: Date,
+        lastModified: Date,
+        doneAt: Date? = nil,
+        dueDate: Date? = nil,
+        deletedAt: Date? = nil,
         owner: User,
         assignedUsers: [AssignedUser] = []
     ) {
@@ -60,10 +93,14 @@ final class Card {
         self.title = title
         self.cardDescription = description
         self.stackId = stackId
+        self.type = type
         self.order = order
+        self.archived = archived
         self.labels = labels
-        self.done = done ?? false
-        self.duedate = duedate
+        self.createdAt = createdAt
+        self.lastModified = lastModified
+        self.doneAt = doneAt
+        self.dueDate = dueDate
         self.deletedAt = deletedAt
         self.owner = owner
         self.assignedUsers = assignedUsers
@@ -72,13 +109,9 @@ final class Card {
 
 extension Card {
     convenience init(dto: CardDTO) {
+        let iso = ISO8601DateFormatter()
 
         let labelModels = dto.labels.map { DeckLabel(dto: $0) }
-        var cardDueDate: Date?
-        if dto.duedate != nil {
-            let formatter = ISO8601DateFormatter()
-            cardDueDate = formatter.date(from: dto.duedate!)
-        }
         let assignedUsers = dto.assignedUsers.map { AssignedUser(dto: $0) }
 
         self.init(
@@ -86,11 +119,15 @@ extension Card {
             title: dto.title,
             description: dto.description,
             stackId: dto.stackId,
+            type: dto.type,
             order: dto.order,
+            archived: dto.archived,
             labels: labelModels,
-            done: dto.done,
-            duedate: cardDueDate,
-            deletedAt: dto.deletedAt,
+            createdAt: Date(timeIntervalSince1970: TimeInterval(dto.createdAt)),
+            lastModified: Date(timeIntervalSince1970: TimeInterval(dto.lastModified)),
+            doneAt: dto.done.flatMap { iso.date(from: $0) },
+            dueDate: dto.duedate.flatMap { iso.date(from: $0) },
+            deletedAt: dto.deletedAt == 0 ? nil : Date(timeIntervalSince1970: TimeInterval(dto.deletedAt)),
             owner: .init(dto: dto.owner),
             assignedUsers: assignedUsers
         )

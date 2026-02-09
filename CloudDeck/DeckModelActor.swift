@@ -98,7 +98,25 @@ extension DeckModelActor {
         }
     }
 
+    func insertNewCard(from dto: CardDTO) throws {
+
+        // fetch stack first (must exist — we created card inside it)
+        guard let stack = fetchStack(id: dto.stackId) else {
+            return
+//            throw DeckSyncError.missingStack(dto.stackId)
+        }
+
+//        let labelModels = dto.labels.map { DeckLabel(dto: $0) }
+
+        let card = Card(dto: dto)
+
+        // relationship — SwiftData manages inverse automatically
+        card.stack = stack
+        modelContext.insert(card)
+        try modelContext.save()
+    }
 }
+
 extension DeckModelActor {
 
     // MARK: - Fetch helpers

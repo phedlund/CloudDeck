@@ -15,6 +15,7 @@ struct SheetItem: Identifiable {
 struct CardsColumnView: View {
     let stackID: Int?
     @State private var activeSheet: SheetItem?
+    @State private var showNewCardSheet = false
 
     @Query private var cards: [Card]
     @Query private var stacks: [Stack]
@@ -47,6 +48,23 @@ struct CardsColumnView: View {
         .sheet(item: $activeSheet) {
             CardDetailSheet(cardID: $0.id)
         }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+//                if let _ = selectedStackID {
+                    Button {
+                        showNewCardSheet = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+//                }
+            }
+        }
+        .sheet(isPresented: $showNewCardSheet) {
+            if let stack = stacks.first {
+                NewCardSheet(boardID: stack.boardId, stackID: stack.id)
+            }
+        }
+
     }
 }
 

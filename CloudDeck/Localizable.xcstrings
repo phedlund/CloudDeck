@@ -66,13 +66,28 @@
     "Connect to Nextcloud" : {
 
     },
+    "Created %@" : {
+
+    },
     "Description" : {
+
+    },
+    "Done" : {
+
+    },
+    "Due date" : {
 
     },
     "Enter your Nextcloud server address" : {
 
     },
     "Log Out" : {
+
+    },
+    "Modified %@" : {
+
+    },
+    "New Card" : {
 
     },
     "Owner" : {
@@ -91,6 +106,9 @@
 
     },
     "This will remove your account from this device. Your data on the server will not be affected." : {
+
+    },
+    "Title" : {
 
     },
     "Username" : {

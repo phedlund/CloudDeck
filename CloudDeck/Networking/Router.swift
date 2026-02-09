@@ -31,12 +31,19 @@ enum Router {
     case cards(stackId: Int)
     case card(id: Int)
 
+    case createCard(boardId: Int, stackId: Int, title: String, description: String?)
+    case updateCard(boardId: Int, stackId: Int, cardId: Int, title: String?, description: String?, type: String, owner: String, order: Int?, duedate: String?, archived: Bool?, done: String?)
+
     private var method: Method {
         switch self {
         case .boards:
             return .get
         case .board, .stacks, .cards, .card:
             return .get
+        case .createCard:
+            return .post
+        case .updateCard:
+            return .put
         }
     }
 
@@ -52,9 +59,51 @@ enum Router {
             "/stacks/\(stackId)/cards"
         case .card(let id):
             "/cards/\(id)"
+        case .createCard(let boardId, let stackId, _, _):
+            "/boards/\(boardId)/stacks/\(stackId)/cards"
+        case .updateCard(let boardId, let stackId, let cardId, _, _, _, _, _, _, _, _):
+            "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)"
         }
     }
 
+    private var body: Data? {
+        switch self {
+
+        case .updateCard(_, _, _, let title, let description, let type, let owner, let order, let duedate, let archived, let done):
+
+            let payload: [String: Any?] = [
+                "title": title,
+                "description": description,
+                "type": type,
+                "owner": owner,
+                "order": order,
+                "archived": archived,
+                "done": done
+            ]
+
+            let json = try? JSONSerialization.data(
+                withJSONObject: payload.compactMapValues { $0 }
+            )
+            return json
+
+
+        case .createCard(_, _, let title, let description):
+            let payload: [String: Any?] = [
+                "title": title,
+                "type": "plain",
+                "order": 999,
+                "description": description
+            ]
+
+            return try? JSONSerialization.data(
+                withJSONObject: payload.compactMapValues { $0 }
+            )
+
+        default:
+            return nil
+        }
+    }
+    
     private var basicAuthHeader: String {
         return ValetManager.shared.basicAuthHeader
     }
@@ -76,22 +125,19 @@ enum Router {
         urlRequest.setValue("true", forHTTPHeaderField: Constants.Headers.ocsApiRequest)
         // urlRequest.setValue("Wed, 04 Feb 2026 00:17:06 GMT", forHTTPHeaderField: "If-Modified-Since")
         print(etag)
-        urlRequest.setValue(etag, forHTTPHeaderField: Constants.Settings.etag)
         urlRequest.setValue("application/json", forHTTPHeaderField: Constants.Headers.accept)
 
-        switch self {
-        case .boards:
-            break
-        case .board(let id):
-            break
-        case .stacks(let boardId):
-            break
-        case .cards(let stackId):
-            break
-        case .card(let id):
-            break
+        // Only send ETag on GET
+        if method == .get {
+            urlRequest.setValue(etag, forHTTPHeaderField: Constants.Headers.ifNoneMatch)
+        }
+
+        if let body {
+            urlRequest.httpBody = body
+            urlRequest.setValue("application/json", forHTTPHeaderField: Constants.Headers.contentType)
         }
 
         return urlRequest
     }
+
 }

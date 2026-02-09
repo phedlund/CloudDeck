@@ -28,6 +28,23 @@ final class DeckAPI {
 
     private let backgroundActor: DeckModelActor
     private let backgroundSession: URLSession
+    private let iso: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [
+            .withInternetDateTime,
+            .withColonSeparatorInTimeZone
+        ]
+        return f
+    }()
+
+    private let deckDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.calendar = Calendar(identifier: .iso8601)
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = TimeZone(secondsFromGMT: 0)
+        f.dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXXXX"
+        return f
+    }()
 
     init(modelContainer: ModelContainer) {
         self.backgroundActor = DeckModelActor(modelContainer: modelContainer)
@@ -183,8 +200,59 @@ final class DeckAPI {
         try? await backgroundActor.save()
     }
 
+    func createCard(boardId: Int, stackId: Int, title: String, description: String? = nil) async throws {
+        let request = try Router.createCard(
+            boardId: boardId,
+            stackId: stackId,
+            title: title,
+            description: description
+        ).urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+        let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
+        try await backgroundActor.insertNewCard(from: cardDTO)
+    }
+
+    func setCardDone(card: Card, done: Bool) async throws {
+
+        let doneString = iso.string(from: card.doneAt ?? Date())
+
+        let request = try Router.updateCard(
+            boardId: card.stack?.boardId ?? 0,
+            stackId: card.stackId,
+            cardId: card.id,
+            title: card.title,
+            description: card.cardDescription,
+            type: card.type,
+            owner: card.owner.uid,
+            order: card.order,
+            duedate: nil,
+            archived: false,
+            done: doneString
+        ).urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+        
+        guard let http = response as? HTTPURLResponse,
+              http.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
+        try await backgroundActor.insertNewCard(from: cardDTO)
+    }
+
 }
 
 enum DeckError: Error {
     case notModified
+    case serverError
 }
