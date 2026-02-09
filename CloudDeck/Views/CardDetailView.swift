@@ -28,25 +28,25 @@ struct CardDetailView: View {
                     .frame(minHeight: 120)
                 }
 
-                            Section {
-                                Label {
-                                    Toggle("Done", isOn: Binding(
-                                        get: {
-                                            card.doneAt != nil
-                                        },
-                                        set: { newValue in
-                                            Task {
-                                                do {
-                                                    try await deckAPI.setCardDone(card: card, done: newValue)
-                                                } catch {
-                                                    // handle error / revert UI if you want
-                                                }
-                                            }
-                                        }
-                                    ))                                } icon: {
-                                    Image(systemName: "checkmark")
+                Section {
+                    Label {
+                        Toggle("Done", isOn: Binding(
+                            get: {
+                                card.doneAt != nil
+                            },
+                            set: { newValue in
+                                Task {
+                                    do {
+                                        try await deckAPI.setCardDone(card: card, done: newValue)
+                                    } catch {
+                                        // handle error / revert UI if you want
+                                    }
                                 }
                             }
+                        ))                                } icon: {
+                            Image(systemName: "checkmark")
+                        }
+                }
 
                 Section {
                     TaskDatePicker(date: $card.dueDate)
@@ -76,8 +76,6 @@ struct CardDetailView: View {
                 }
 
             }
-//            .scrollContentBackground(.hidden)
-//            .background(.background.secondary)
             .navigationTitle($card.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
