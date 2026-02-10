@@ -12,6 +12,9 @@ struct CardDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(DeckAPI.self) private var deckAPI
 
+    @State private var descriptionUpdateTask: Task<Void, Never>?
+    @State private var titleUpdateTask: Task<Void, Never>?
+
     var body: some View {
         VStack {
             HStack {
@@ -21,11 +24,11 @@ struct CardDetailView: View {
             .padding(.horizontal)
             Form {
                 Section("Description") {
-                    TextEditor(text: Binding(
-                        get: { card.cardDescription ?? "" },
-                        set: { card.cardDescription = $0 }
-                    ))
-                    .frame(minHeight: 120)
+                    TextEditor(text: $card.cardDescription.emptyString)
+                        .onChange(of: card.cardDescription) {
+                            scheduleDescriptionUpdate()
+                        }
+                        .frame(minHeight: 120)
                 }
 
                 Section {
@@ -58,7 +61,15 @@ struct CardDetailView: View {
                 if !$card.labels.isEmpty {
                     Section {
                         Label {
-                            TagFlowView(tags: card.labels)
+                            ChipFlowView(card.labels) { label in
+                                ChipView(
+                                    title: label.title,
+                                    colorHex: label.color,
+                                    onRemove: {
+//                                        removeTag(tag)
+                                    }
+                                )
+                            }
                         } icon: {
                             Image(systemName: "tag")
                         }
@@ -96,9 +107,35 @@ struct CardDetailView: View {
                 }
 
             }
+            .onChange(of: card.title, initial: false) { _, newValue in
+                scheduleTitleUpdate()
+            }
         }
         .background(.background.secondary)
     }
+
+    private func scheduleDescriptionUpdate() {
+        descriptionUpdateTask?.cancel()
+
+        descriptionUpdateTask = Task {
+            try? await Task.sleep(for: .milliseconds(700))
+            guard !Task.isCancelled else { return }
+
+            try? await deckAPI.updateCard(card)
+        }
+    }
+
+    private func scheduleTitleUpdate() {
+        titleUpdateTask?.cancel()
+
+        titleUpdateTask = Task {
+            try? await Task.sleep(for: .milliseconds(700))
+            guard !Task.isCancelled else { return }
+
+            try? await deckAPI.updateCard(card)
+        }
+    }
+
 }
 
 struct LiveRelativeDateView: View {
@@ -130,5 +167,14 @@ struct LiveRelativeDateView: View {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .full // "1 minute ago" vs "1 min ago"
         return formatter.localizedString(for: date, relativeTo: referenceDate)
+    }
+}
+
+extension Binding where Value == String? {
+    var emptyString: Binding<String> {
+        Binding<String>(
+            get: { wrappedValue ?? "" },
+            set: { wrappedValue = $0 }   // ← keep empty string, don’t turn into nil
+        )
     }
 }
