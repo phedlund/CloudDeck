@@ -25,7 +25,7 @@ struct BoardsColumnView: View {
             Label {
                 Text(board.title)
             } icon: {
-                Circle().fill(Color(hex: board.colorHex) ?? .secondary)
+                Circle().fill(Color(hex: board.color) ?? .secondary)
             }
             .tag(board.id)
         }

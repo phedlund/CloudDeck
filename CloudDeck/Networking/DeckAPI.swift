@@ -68,6 +68,7 @@ final class DeckAPI {
 //        let currentStatus = try await newsStatus()
 //        if hasItems && lastModified > 0 {
         let boardIDs = try await syncBoards()
+        try await getBoardDetails(boardIDs: boardIDs)
         try await syncStacks(boardIDs: boardIDs)
 //        } else {
 //            try await initialSync()
@@ -98,9 +99,9 @@ final class DeckAPI {
 
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategy = .secondsSince1970
-                if let deckBoardDTOs = try? decoder.decode([BoardDTO].self, from: data) {
+                if let deckBoardDTOs = try? decoder.decode([BoardSummaryDTO].self, from: data) {
                     for deckBoardDTO in deckBoardDTOs  {
-                        await backgroundActor.upsert(deckBoardDTO)
+                        await backgroundActor.insert(deckBoardDTO)
                     }
                     try? await backgroundActor.save()
                     result = deckBoardDTOs.map((\.id))
@@ -114,6 +115,35 @@ final class DeckAPI {
             }
         }
         return result
+    }
+
+    private func getBoardDetails(boardIDs: [Int]) async throws {
+        for boardId in boardIDs {
+            let (data, response) = try await URLSession.shared.data(for: Router.board(id: boardId).urlRequest())
+            if let response = response as? HTTPURLResponse {
+                switch response.statusCode {
+                case 200:
+                    let headers = response.allHeaderFields
+                    for header in headers {
+                        print("\(header.key): \(header.value)")
+                    }
+
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .secondsSince1970
+                    if let boardDTO = try? decoder.decode(BoardDetailDTO.self, from: data) {
+                        await backgroundActor.insert(boardDTO)
+                        try? await backgroundActor.save()
+                    }
+                case 304:
+                    print("304")
+                case 401:
+                    print("401")
+                default:
+                    print("unknown status code: \(response.statusCode)")
+                }
+            }
+        }
+
     }
 
     private func syncStacks(boardIDs: [Int]) async throws {
@@ -142,62 +172,6 @@ final class DeckAPI {
                 }
             }
         }
-    }
-
-    private func repeatSync() async throws {
-
-        let syncRequests = try await syncRequests()
-
-        let results = try await withThrowingTaskGroup(of: (Int, Data).self) { group in
-            var results = [Int: Data]()
-
-//            group.addTask { [self] in
-//                try await pruneItems()
-//                return (0, Data())
-//            }
-            group.addTask {
-                return (1, try await URLSession.shared.data (for: syncRequests.boardRequest).0)
-            }
-            group.addTask {
-                return (2, try await URLSession.shared.data (for: syncRequests.stackRequest).0)
-            }
-            group.addTask {
-                return (3, try await URLSession.shared.data (for: syncRequests.cardRequest).0)
-            }
-
-            for try await (index, result) in group {
-                results[index] = result
-            }
-
-            return results
-        }
-
-        if let boardData = results[1] as Data?, !boardData.isEmpty {
-//            syncState = .folders
-            await parseBoards(data: boardData)
-        }
-        if let stackData = results[2] as Data?, !stackData.isEmpty {
-//            syncState = .feeds
-//            await parseFeeds(data: stackData)
-        }
-        if let cardData = results[3] as Data?, !cardData.isEmpty {
-//            syncState = .articles(current: 0, total: 0)
-//            await parseItems(data: cardData)
-        }
-    }
-
-    private func parseBoards(data: Data) async {
-//        logger.info("Parsing folders")
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .secondsSince1970
-        guard let decodedResponse = try? decoder.decode([BoardDTO].self, from: data) else {
-            //                    throw NetworkError.generic(message: "Unable to decode")
-            return
-        }
-        for deckBoardDTO in decodedResponse  {
-            await backgroundActor.upsert(deckBoardDTO)
-        }
-        try? await backgroundActor.save()
     }
 
     func createCard(boardId: Int, stackId: Int, title: String, description: String? = nil) async throws {

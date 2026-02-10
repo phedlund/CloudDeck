@@ -28,6 +28,7 @@ final class DeckLabel {
     var lastModified: Date
     var ETag: String
 
+    @Relationship(inverse: \Board.labels) var board: Board?
     var card: Card?
 
     init(id: Int,

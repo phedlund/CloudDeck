@@ -31,12 +31,15 @@ final class User: Identifiable {
     var assignedUser: AssignedUser?
     var card: Card?
 
+    @Relationship(inverse: \Board.users) var boards: [Board] = []
+
     init(primaryKey: String, displayName: String, type: Int, uid: String) {
         self.primaryKey = primaryKey
         self.displayName = displayName
         self.type = type
         self.uid = uid
     }
+
 }
 
 extension User {

@@ -14,7 +14,11 @@ public let schema = Schema([
     Card.self,
     DeckLabel.self,
     User.self,
-    AssignedUser.self
+    AssignedUser.self,
+    Permissions.self,
+    ACLItem.self,
+    ActiveSession.self,
+    BoardSettings.self
 ])
 
 @ModelActor
@@ -30,7 +34,13 @@ actor DeckModelActor: Sendable {
 
 extension DeckModelActor {
 
-    func upsert(_ dto: BoardDTO) {
+    func insert(_ dto: BoardSummaryDTO) {
+        modelContext.insert(
+            Board(dto: dto)
+        )
+    }
+
+    func insert(_ dto: BoardDetailDTO) {
         modelContext.insert(
             Board(dto: dto)
         )
