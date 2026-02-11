@@ -53,7 +53,16 @@ struct CardDetailView: View {
                             ChipView(
                                 title: label.title,
                                 colorHex: label.color,
-                                onRemove: { }
+                                onRemove: {
+                                    Task {
+                                        do {
+                                            try await deckAPI.removeCardLabel(card: card, label: label)
+                                            // TODO only returns success, need to update db locally
+                                        } catch {
+                                            // handle error / revert UI if you want
+                                        }
+                                    }
+                                }
                             )
                         } trailing: {
                             Button {
@@ -67,7 +76,15 @@ struct CardDetailView: View {
                                 VStack(alignment: .leading, spacing: 8) {
                                     ForEach(boardLabels) { label in
                                         Button {
-                                            //
+                                            Task {
+                                                do {
+                                                    try await deckAPI.assignCardLabel(card: card, label: label)
+                                                    // TODO only returns success, need to update db locally
+                                                } catch {
+                                                    // handle error / revert UI if you want
+                                                }
+                                                showLabels = false
+                                            }
                                         } label: {
                                             ChipView(title: label.title, colorHex: label.color)
                                         }

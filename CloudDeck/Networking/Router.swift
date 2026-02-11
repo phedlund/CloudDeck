@@ -34,6 +34,9 @@ enum Router {
     case createCard(boardId: Int, stackId: Int, title: String, description: String?)
     case updateCard(boardId: Int, stackId: Int, cardId: Int, title: String?, description: String?, type: String, owner: String, order: Int?, duedate: String?, archived: Bool?, done: String?)
 
+    case assignLabel(boardId: Int, stackId: Int, cardId: Int, labelId: Int)
+    case removeLabel(boardId: Int, stackId: Int, cardId: Int, labelId: Int)
+
     private var method: Method {
         switch self {
         case .boards:
@@ -42,7 +45,7 @@ enum Router {
             return .get
         case .createCard:
             return .post
-        case .updateCard:
+        case .updateCard, .assignLabel, .removeLabel:
             return .put
         }
     }
@@ -63,6 +66,10 @@ enum Router {
             "/boards/\(boardId)/stacks/\(stackId)/cards"
         case .updateCard(let boardId, let stackId, let cardId, _, _, _, _, _, _, _, _):
             "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)"
+        case .assignLabel(let boardId, let stackId, let cardId, _):
+            "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)/assignLabel"
+        case .removeLabel(let boardId, let stackId, let cardId, _):
+            "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)/removeLabel"
         }
     }
 
@@ -82,11 +89,9 @@ enum Router {
                 "done": done
             ]
 
-            let json = try? JSONSerialization.data(
+            return try? JSONSerialization.data(
                 withJSONObject: payload.compactMapValues { $0 }
             )
-            return json
-
 
         case .createCard(_, _, let title, let description):
             let payload: [String: Any?] = [
@@ -96,6 +101,15 @@ enum Router {
                 "description": description
             ]
 
+            return try? JSONSerialization.data(
+                withJSONObject: payload.compactMapValues { $0 }
+            )
+
+        case .assignLabel(_, _, _, let labelId), .removeLabel(_, _, _, let labelId):
+            let payload: [String: Any?] = [
+                "labelId": labelId
+            ]
+            
             return try? JSONSerialization.data(
                 withJSONObject: payload.compactMapValues { $0 }
             )

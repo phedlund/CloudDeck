@@ -310,6 +310,57 @@ final class DeckAPI {
         try await backgroundActor.insertNewCard(from: cardDTO)
     }
 
+    func assignCardLabel(card: Card, label: DeckLabel) async throws {
+
+        let request = try Router.assignLabel(
+            boardId: card.stack?.boardId ?? 0,
+            stackId: card.stackId,
+            cardId: card.id,
+            labelId: label.id
+        ).urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        if let response = response as? HTTPURLResponse {
+            switch response.statusCode {
+            case 200:
+                try await updateCard(card)
+            default:
+                throw DeckError.serverError
+            }
+        }
+    }
+
+    func removeCardLabel(card: Card, label: DeckLabel) async throws {
+
+        let request = try Router.removeLabel(
+            boardId: card.stack?.boardId ?? 0,
+            stackId: card.stackId,
+            cardId: card.id,
+            labelId: label.id
+        ).urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        if let response = response as? HTTPURLResponse {
+            switch response.statusCode {
+            case 200:
+                let filteredLabels = card.labels.filter( { $0.id != label.id } )
+                card.labels = filteredLabels
+//                try await updateCard(card)
+            default:
+                throw DeckError.serverError
+            }
+        }
+    }
 
 }
 
