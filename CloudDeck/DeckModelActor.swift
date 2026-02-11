@@ -41,9 +41,8 @@ extension DeckModelActor {
     }
 
     func insert(_ dto: BoardDetailDTO) {
-        modelContext.insert(
-            Board(dto: dto)
-        )
+        let board = fetchBoard(id: dto.id)
+        board?.applyDetail(from: dto)
     }
 
     func apply(stackDTOs: [StackDTO], boardID: Int) throws {

@@ -5,6 +5,7 @@
 //  Created by Peter Hedlund on 2/5/26.
 //
 
+import SwiftData
 import SwiftUI
 
 struct CardDetailView: View {
@@ -14,6 +15,21 @@ struct CardDetailView: View {
 
     @State private var descriptionUpdateTask: Task<Void, Never>?
     @State private var titleUpdateTask: Task<Void, Never>?
+
+    @State private var showLabels = false
+    @State private var pickedLabel: DeckLabel?
+
+    @State private var showUsers = false
+
+    @Query(filter: #Predicate<Board> { !$0.archived }, sort: \.title) private var boards: [Board]
+
+    var boardLabels: [DeckLabel] {
+        if let board = boards.first( where: { $0.id == card.stack?.boardId } ) {
+            let labels = board.labels
+            return labels
+        }
+        return []
+    }
 
     var body: some View {
         VStack {
@@ -33,7 +49,74 @@ struct CardDetailView: View {
 
                 Section {
                     Label {
-                        Toggle("Done", isOn: Binding(
+                        ChipFlowView(card.labels) { label in
+                            ChipView(
+                                title: label.title,
+                                colorHex: label.color,
+                                onRemove: { }
+                            )
+                        } trailing: {
+                            Button {
+                                showLabels = true
+                            } label: {
+                                Image(systemName: "plus")
+                                    .imageScale(.large)
+                            }
+                            .buttonStyle(.borderless)
+                            .popover(isPresented: $showLabels) {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    ForEach(boardLabels) { label in
+                                        Button {
+                                            //
+                                        } label: {
+                                            ChipView(title: label.title, colorHex: label.color)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+                                .padding()
+                                .presentationCompactAdaptation(.popover)
+                            }
+                        }
+                    } icon: {
+                        Image(systemName: "tag")
+                    }
+                    Label {
+                        ChipFlowView(card.assignedUsers) { user in
+                            ChipView(
+                                title: user.user.displayName,
+                                colorHex: "ffffff",
+                                onRemove: { }
+                            )
+                        } trailing: {
+                            Button {
+                                showUsers = true
+                            } label: {
+                                Image(systemName: "plus")
+                                    .imageScale(.large)
+                            }
+                            .buttonStyle(.borderless)
+                            .popover(isPresented: $showUsers) {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    ForEach(boardLabels) { label in
+                                        Button {
+                                            //
+                                        } label: {
+                                            ChipView(title: label.title, colorHex: label.color)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+                                .padding()
+                                .presentationCompactAdaptation(.popover)
+                            }
+                        }
+                    } icon: {
+                        Image(systemName: "person")
+                    }
+                    TaskDatePicker(date: $card.dueDate)
+                    Label {
+                        Toggle("", isOn: Binding(
                             get: {
                                 card.doneAt != nil
                             },
@@ -51,38 +134,6 @@ struct CardDetailView: View {
                         Image(systemName: "checkmark")
                     }
                 }
-
-                Section {
-                    TaskDatePicker(date: $card.dueDate)
-                } header: {
-                    Text("Due date")
-                }
-
-                if !$card.labels.isEmpty {
-                    Section {
-                        Label {
-                            ChipFlowView(card.labels) { label in
-                                ChipView(
-                                    title: label.title,
-                                    colorHex: label.color,
-                                    onRemove: {
-//                                        removeTag(tag)
-                                    }
-                                )
-                            }
-                        } icon: {
-                            Image(systemName: "tag")
-                        }
-                    }
-                }
-                if !$card.assignedUsers.isEmpty {
-                    Section("Assigned Users") {
-                        ForEach(card.assignedUsers) {
-                            Label($0.user.displayName, systemImage: "person")
-                        }
-                    }
-                }
-
                 Section("Owner") {
                     Label(card.owner.displayName, systemImage: "person")
                 }

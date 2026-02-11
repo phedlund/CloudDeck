@@ -10,7 +10,7 @@ import SwiftUI
 struct ChipView: View {
     let title: String
     let colorHex: String
-    var onRemove: () -> Void
+    var onRemove: (() -> Void)? = nil
 
     var body: some View {
         let pillColor = Color(hex: colorHex) ?? .secondary.opacity(0.3)
@@ -22,21 +22,22 @@ struct ChipView: View {
                 .font(.caption)
                 .foregroundStyle(textColor)
                 .padding(.horizontal, 10)
-                .padding(.vertical, 6)   // slightly tighter
+                .padding(.vertical, 6)
                 .background(
                     Capsule().fill(pillColor)
                 )
-
-            Button(action: onRemove) {
-                Image(systemName: "xmark")
-                    .font(.caption2)
-                    .padding(4)
-                    .contentShape(Rectangle())
+            if let onRemove {
+                Button(action: onRemove) {
+                    Image(systemName: "xmark")
+                        .font(.caption2)
+                        .padding(4)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
         .padding(.horizontal, 0)
-        .padding(.trailing, 6)
+        .padding(.trailing, onRemove != nil ? 6 : 0)
         .background(
             Capsule().fill(.secondary.opacity(0.15))
         )

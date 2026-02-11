@@ -197,18 +197,23 @@ extension Board {
         eTag = dto.eTag
     }
 
-//    func applyDetail(from dto: BoardDetailDTO) {
-//        applySummary(from: dto)
-//        stacks = dto.stacks.map(Stack.init)
-//        labels = dto.labels.map(Label.init)
-//        permissions = Permissions(canRead: dto.permissions.READ,
-//                                  canEdit: dto.permissions.EDIT,
-//                                  canManage: dto.permissions.MANAGE,
-//                                  canShare: dto.permissions.SHARE)
-//        users = dto.users.map(User.init)
+    func applyDetail(from dto: BoardDetailDTO) {
+        title = dto.title
+        color = dto.color
+        archived = dto.archived
+        deletedAt = dto.deletedAt
+        lastModified = Date(timeIntervalSince1970: TimeInterval(dto.lastModified))
+        eTag = dto.eTag
+        stacks = dto.stacks.map(Stack.init)
+        labels = dto.labels.map(DeckLabel.init)
+        permissions = Permissions(canRead: dto.permissions.canRead,
+                                  canEdit: dto.permissions.canEdit,
+                                  canManage: dto.permissions.canManage,
+                                  canShare: dto.permissions.canShare)
+        users = dto.users.map(User.init)
 //        activeSessions = dto.activeSessions.map(ActiveSession.init)
 //        settings = BoardSettings(notifyDue: dto.settings["notify-due"],
 //                                 calendar: dto.settings["calendar"])
-//        acl = dto.acl.map { ACLItem(uid: $0.uid, permission: $0.permission) }
-//    }
+        acl = dto.acl.map { ACLItem(uid: $0.uid, permission: $0.permission) }
+    }
 }

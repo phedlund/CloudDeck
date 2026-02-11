@@ -7,24 +7,29 @@
 
 import SwiftUI
 
-struct ChipFlowView<Data: RandomAccessCollection, Content: View>: View where Data.Element: Identifiable {
+struct ChipFlowView<Data: RandomAccessCollection, Content: View, Trailing: View>: View
+where Data.Element: Identifiable {
 
     let data: Data
     let content: (Data.Element) -> Content
+    let trailing: Trailing
 
     init(
         _ data: Data,
-        @ViewBuilder content: @escaping (Data.Element) -> Content
+        @ViewBuilder content: @escaping (Data.Element) -> Content,
+        @ViewBuilder trailing: () -> Trailing
     ) {
         self.data = data
         self.content = content
+        self.trailing = trailing()
     }
 
     var body: some View {
-        ChipFlowLayout {
+        FlowLayout(spacing: 6) {
             ForEach(data) { element in
                 content(element)
             }
+            trailing
         }
     }
 }
