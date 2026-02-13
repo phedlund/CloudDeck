@@ -60,6 +60,11 @@ extension DeckModelActor {
         try modelContext.save()
     }
 
+    func addStack(_ dto: StackDTO) throws {
+        modelContext.insert(Stack(dto: dto))
+        try modelContext.save()
+    }
+
     private func reconcileCards(stackID: Int, cardDTOs: [CardDTO]) throws {
 
         var serverIDs = Set<Int>()

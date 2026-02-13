@@ -16,6 +16,8 @@ struct StacksColumnView: View {
     @Query private var stacks: [Stack]
     @Query private var cards: [Card]
 
+    @State private var showNewStackSheet: Bool = false
+
     init(boardID: Int?, selectedStackID: Binding<Int?>) {
         self.boardID = boardID
         self._selectedStackID = selectedStackID
@@ -52,5 +54,17 @@ struct StacksColumnView: View {
             }
             .tag(stack.id)        }
         .navigationTitle(boardTitle)
+        .toolbar {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button {
+                    showNewStackSheet = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .sheet(isPresented: $showNewStackSheet) {
+            NewStackSheet(boardId: boardID ?? 0)
+        }
     }
 }

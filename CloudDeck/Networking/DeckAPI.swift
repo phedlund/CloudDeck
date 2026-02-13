@@ -192,6 +192,29 @@ final class DeckAPI {
         try await getBoardDetails(boardIDs: [boardDTO.id])
     }
 
+    func createStack(boardId: Int, title: String, order: Int) async throws {
+        let request = try! Router.createStack(boardId: boardId, title: title, order: order)
+            .urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+        if let deckStackDTO = try? decoder.decode(StackDTO.self, from: data) {
+            try await backgroundActor.addStack(deckStackDTO)
+            try? await backgroundActor.save()
+        }
+
+    }
+
     func createCard(boardId: Int, stackId: Int, title: String, description: String? = nil) async throws {
         let request = try Router.createCard(
             boardId: boardId,

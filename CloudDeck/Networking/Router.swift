@@ -32,6 +32,7 @@ enum Router {
     case card(id: Int)
 
     case createBoard(title: String, hexColor: String)
+    case createStack(boardId: Int, title: String, order: Int)
 
     case createCard(boardId: Int, stackId: Int, title: String, description: String?)
     case updateCard(boardId: Int, stackId: Int, cardId: Int, title: String?, description: String?, type: String, owner: String, order: Int?, duedate: String?, archived: Bool?, done: String?)
@@ -48,7 +49,7 @@ enum Router {
             return .get
         case .board, .stacks, .cards, .card:
             return .get
-        case .createBoard, .createCard:
+        case .createBoard, .createStack, .createCard:
             return .post
         case .updateCard, .assignLabel, .removeLabel, .assignUser, .unassignUser:
             return .put
@@ -64,6 +65,8 @@ enum Router {
         case .board(let id):
             "/boards/\(id)"
         case .stacks(let boardId):
+            "/boards/\(boardId)/stacks"
+        case .createStack(let boardId, _, _):
             "/boards/\(boardId)/stacks"
         case .cards(let stackId):
             "/stacks/\(stackId)/cards"
@@ -108,6 +111,16 @@ enum Router {
             let payload: [String: Any?] = [
                 "title": title,
                 "color": hexColor
+            ]
+            
+            return try? JSONSerialization.data(
+                withJSONObject: payload.compactMapValues { $0 }
+                , options: [])
+
+        case .createStack(_, let title, let order):
+            let payload: [String: Any?] = [
+                "title": title,
+                "order": order
             ]
             
             return try? JSONSerialization.data(
