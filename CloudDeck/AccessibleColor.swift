@@ -68,7 +68,7 @@ extension Color {
         let a = cgColor.alpha
 
         var color = String(
-            format: "#%02lX%02lX%02lX",
+            format: "%02lX%02lX%02lX",
             lroundf(Float(r * 255)),
             lroundf(Float(g * 255)),
             lroundf(Float(b * 255))
@@ -79,6 +79,14 @@ extension Color {
         }
 
         return color
+    }
+
+    static func random() -> Color {
+        return Color(
+            red: Double.random(in: 0...1),
+            green: Double.random(in: 0...1),
+            blue: Double.random(in: 0...1)
+        )
     }
 
 }

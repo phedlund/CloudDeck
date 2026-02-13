@@ -174,6 +174,24 @@ final class DeckAPI {
         }
     }
 
+    func createBoard(title: String, colorHex: String) async throws {
+        let request = try Router.createBoard(title: title, hexColor: colorHex)
+            .urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+        let boardDTO = try JSONDecoder().decode(BoardSummaryDTO.self, from: data)
+        await backgroundActor.insert(boardDTO)
+        try await getBoardDetails(boardIDs: [boardDTO.id])
+    }
+
     func createCard(boardId: Int, stackId: Int, title: String, description: String? = nil) async throws {
         let request = try Router.createCard(
             boardId: boardId,
@@ -183,6 +201,10 @@ final class DeckAPI {
         ).urlRequest()
 
         let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
 
         guard (response as? HTTPURLResponse)?.statusCode == 200 else {
             throw DeckError.serverError

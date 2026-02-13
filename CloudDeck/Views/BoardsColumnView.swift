@@ -14,6 +14,8 @@ struct BoardsColumnView: View {
     @Binding var selectedBoardID: Int?
     @Binding var showSettings: Bool
 
+    @State private var showNewBoardSheet: Bool = false
+
     @Query(
         filter: #Predicate<Board> { !$0.archived },
         sort: \.title
@@ -46,7 +48,16 @@ struct BoardsColumnView: View {
                 } label: {
                     Image(systemName: "ellipsis.circle")
                 }
+
+                Button {
+                    showNewBoardSheet = true
+                } label: {
+                    Image(systemName: "plus")
+                }
             }
+        }
+        .sheet(isPresented: $showNewBoardSheet) {
+            NewBoardSheet()
         }
     }
 

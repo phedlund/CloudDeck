@@ -60,6 +60,9 @@
     "Clear Date" : {
 
     },
+    "Color" : {
+
+    },
     "Connect to Nextcloud" : {
 
     },
@@ -76,6 +79,9 @@
 
     },
     "Modified %@" : {
+
+    },
+    "New Board" : {
 
     },
     "New Card" : {

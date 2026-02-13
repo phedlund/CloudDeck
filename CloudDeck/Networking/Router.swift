@@ -31,6 +31,8 @@ enum Router {
     case cards(stackId: Int)
     case card(id: Int)
 
+    case createBoard(title: String, hexColor: String)
+
     case createCard(boardId: Int, stackId: Int, title: String, description: String?)
     case updateCard(boardId: Int, stackId: Int, cardId: Int, title: String?, description: String?, type: String, owner: String, order: Int?, duedate: String?, archived: Bool?, done: String?)
 
@@ -46,7 +48,7 @@ enum Router {
             return .get
         case .board, .stacks, .cards, .card:
             return .get
-        case .createCard:
+        case .createBoard, .createCard:
             return .post
         case .updateCard, .assignLabel, .removeLabel, .assignUser, .unassignUser:
             return .put
@@ -56,6 +58,8 @@ enum Router {
     private var path: String {
         switch self {
         case .boards:
+            "/boards"
+        case .createBoard(_, _):
             "/boards"
         case .board(let id):
             "/boards/\(id)"
@@ -99,6 +103,16 @@ enum Router {
             return try? JSONSerialization.data(
                 withJSONObject: payload.compactMapValues { $0 }
             )
+
+        case .createBoard(let title, let hexColor):
+            let payload: [String: Any?] = [
+                "title": title,
+                "color": hexColor
+            ]
+            
+            return try? JSONSerialization.data(
+                withJSONObject: payload.compactMapValues { $0 }
+                , options: [])
 
         case .createCard(_, _, let title, let description):
             let payload: [String: Any?] = [
