@@ -362,6 +362,58 @@ final class DeckAPI {
         }
     }
 
+    func assignUser(card: Card, user: User) async throws {
+
+        let request = try Router.assignUser(
+            boardId: card.stack?.boardId ?? 0,
+            stackId: card.stackId,
+            cardId: card.id,
+            userId: user.uid
+        ).urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        if let response = response as? HTTPURLResponse {
+            switch response.statusCode {
+            case 200:
+                try await updateCard(card)
+            default:
+                throw DeckError.serverError
+            }
+        }
+    }
+
+    func unassignUser(card: Card, user: User) async throws {
+
+        let request = try Router.unassignUser(
+            boardId: card.stack?.boardId ?? 0,
+            stackId: card.stackId,
+            cardId: card.id,
+            userId: user.uid
+        ).urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        if let response = response as? HTTPURLResponse {
+            switch response.statusCode {
+            case 200:
+                if let index = card.assignedUsers.firstIndex(where: { $0.user.uid  == user.uid } ) {
+                    card.assignedUsers.remove(at: index)
+                }
+            default:
+                throw DeckError.serverError
+            }
+        }
+    }
+
 }
 
 enum DeckError: Error {

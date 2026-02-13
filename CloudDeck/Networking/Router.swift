@@ -37,6 +37,9 @@ enum Router {
     case assignLabel(boardId: Int, stackId: Int, cardId: Int, labelId: Int)
     case removeLabel(boardId: Int, stackId: Int, cardId: Int, labelId: Int)
 
+    case assignUser(boardId: Int, stackId: Int, cardId: Int, userId: String)
+    case unassignUser(boardId: Int, stackId: Int, cardId: Int, userId: String)
+
     private var method: Method {
         switch self {
         case .boards:
@@ -45,7 +48,7 @@ enum Router {
             return .get
         case .createCard:
             return .post
-        case .updateCard, .assignLabel, .removeLabel:
+        case .updateCard, .assignLabel, .removeLabel, .assignUser, .unassignUser:
             return .put
         }
     }
@@ -70,6 +73,10 @@ enum Router {
             "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)/assignLabel"
         case .removeLabel(let boardId, let stackId, let cardId, _):
             "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)/removeLabel"
+        case .assignUser(let boardId, let stackId, let cardId, _):
+            "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)/assignUser"
+        case .unassignUser(let boardId, let stackId, let cardId, _):
+            "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)/unassignUser"
         }
     }
 
@@ -110,6 +117,15 @@ enum Router {
                 "labelId": labelId
             ]
             
+            return try? JSONSerialization.data(
+                withJSONObject: payload.compactMapValues { $0 }
+            )
+
+        case .assignUser(_, _, _, let userId), .unassignUser(_, _, _, let userId):
+            let payload: [String: Any?] = [
+                "userId": userId
+            ]
+
             return try? JSONSerialization.data(
                 withJSONObject: payload.compactMapValues { $0 }
             )

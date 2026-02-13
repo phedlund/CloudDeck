@@ -31,6 +31,14 @@ struct CardDetailView: View {
         return []
     }
 
+    var boardUsers: [User] {
+        if let board = boards.first( where: { $0.id == card.stack?.boardId } ) {
+            let users = board.users
+            return users
+        }
+        return []
+    }
+
     var body: some View {
         VStack {
             HStack {
@@ -102,8 +110,17 @@ struct CardDetailView: View {
                         ChipFlowView(card.assignedUsers) { user in
                             ChipView(
                                 title: user.user.displayName,
-                                colorHex: "ffffff",
-                                onRemove: { }
+                                colorHex: Color.secondary.opacity(0.3).hexString,
+                                onRemove: {
+                                    Task {
+                                        do {
+                                            try await deckAPI.unassignUser(card: card, user: user.user)
+                                            // TODO only returns success, need to update db locally
+                                        } catch {
+                                            // handle error / revert UI if you want
+                                        }
+                                    }
+                                }
                             )
                         } trailing: {
                             Button {
@@ -115,11 +132,19 @@ struct CardDetailView: View {
                             .buttonStyle(.borderless)
                             .popover(isPresented: $showUsers) {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    ForEach(boardLabels) { label in
+                                    ForEach(boardUsers) { user in
                                         Button {
-                                            //
+                                            Task {
+                                                do {
+                                                    try await deckAPI.assignUser(card: card, user: user)
+                                                    // TODO only returns success, need to update db locally
+                                                } catch {
+                                                    // handle error / revert UI if you want
+                                                }
+                                                showUsers = false
+                                            }
                                         } label: {
-                                            ChipView(title: label.title, colorHex: label.color)
+                                            ChipView(title: user.displayName, colorHex: Color.secondary.opacity(0.3).hexString)
                                         }
                                         .buttonStyle(.plain)
                                     }
