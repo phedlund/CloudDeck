@@ -1,5 +1,5 @@
 //
-//  NewStackSheet.swift
+//  EditStackSheet.swift
 //  CloudDeck
 //
 //  Created by Peter Hedlund on 2/13/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NewStackSheet: View {
+struct EditStackSheet: View {
     @Environment(DeckAPI.self) private var deckAPI
     @Environment(\.dismiss) private var dismiss
 
@@ -30,7 +30,7 @@ struct NewStackSheet: View {
                     EmptyView()
                 }
             }
-            .navigationTitle("New Stack")
+            .navigationTitle("Edit Stack")
             .task {
                 isTextFieldFocused = true
             }
@@ -39,7 +39,7 @@ struct NewStackSheet: View {
                     Button(role: .confirm) {
                         Task {
                             isSaving = true
-                            try? await deckAPI.createStack(boardId: boardId, title: title, order: 999)
+//                            try? await deckAPI.createStack(boardId: boardId, title: title, order: 999)
                             dismiss()
                         }
                     }

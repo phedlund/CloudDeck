@@ -17,11 +17,7 @@ struct BoardsColumnView: View {
     @State private var showNewBoardSheet: Bool = false
     @State private var boardToShowDetails: Board? = nil
 
-    @Query(
-        filter: #Predicate<Board> { !$0.archived },
-        sort: \.title
-    )
-    private var boards: [Board]
+    @Query(filter: #Predicate<Board> { !$0.archived && $0.deletedAt == 0 }, sort: \.title) private var boards: [Board]
 
     var body: some View {
         List(boards, selection: $selectedBoardID) { board in
@@ -39,7 +35,7 @@ struct BoardsColumnView: View {
                 }
                 Button(role: .destructive) {
                     Task {
-                        //                    await newsModel.toggleItemStarred(item: item)
+                        try? await deckAPI.deleteBoard(boardId: board.id)
                     }
                 } label: {
                     Label("Delete", systemImage: "trash")

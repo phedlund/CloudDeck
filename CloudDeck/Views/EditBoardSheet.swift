@@ -49,9 +49,7 @@ struct EditBoardSheet: View {
                                         .labelStyle(.iconOnly)
                                 }
                                 Button(role: .destructive) {
-                                    Task {
-                    //
-                                    }
+//
                                 } label: {
                                     Label("Delete", systemImage: "trash")
                                         .labelStyle(.iconOnly)
