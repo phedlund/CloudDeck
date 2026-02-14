@@ -192,8 +192,25 @@ final class DeckAPI {
         try await getBoardDetails(boardIDs: [boardDTO.id])
     }
 
+    func deleteBoard(boardId: Int) async throws {
+        let request = try Router.deleteBoard(id: boardId)
+            .urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        await backgroundActor.deleteBoard(boardId: boardId)
+    }
+
     func createStack(boardId: Int, title: String, order: Int) async throws {
-        let request = try! Router.createStack(boardId: boardId, title: title, order: order)
+        let request = try Router.createStack(boardId: boardId, title: title, order: order)
             .urlRequest()
 
         let (data, response) = try await URLSession.shared.data(for: request)

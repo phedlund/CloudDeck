@@ -45,6 +45,13 @@ extension DeckModelActor {
         board?.applyDetail(from: dto)
     }
 
+    func deleteBoard(boardId: Int) {
+        if let board = fetchBoard(id: boardId) {
+            modelContext.delete(board)
+            try? modelContext.save()
+        }
+    }
+
     func apply(stackDTOs: [StackDTO], boardID: Int) throws {
 
         var serverStackIDs = Set<Int>()
