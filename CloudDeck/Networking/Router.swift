@@ -35,6 +35,7 @@ enum Router {
     case deleteBoard(id: Int)
 
     case createStack(boardId: Int, title: String, order: Int)
+    case updateStack(boardId: Int, stackId: Int, title: String, order: Int)
 
     case createCard(boardId: Int, stackId: Int, title: String, description: String?)
     case updateCard(boardId: Int, stackId: Int, cardId: Int, title: String?, description: String?, type: String, owner: String, order: Int?, duedate: String?, archived: Bool?, done: String?)
@@ -53,7 +54,7 @@ enum Router {
             return .get
         case .createBoard, .createStack, .createCard:
             return .post
-        case .updateCard, .assignLabel, .removeLabel, .assignUser, .unassignUser:
+        case .updateStack, .updateCard, .assignLabel, .removeLabel, .assignUser, .unassignUser:
             return .put
         case .deleteBoard:
             return .delete
@@ -74,6 +75,8 @@ enum Router {
             "/boards/\(boardId)/stacks"
         case .createStack(let boardId, _, _):
             "/boards/\(boardId)/stacks"
+        case .updateStack(let boardId, let stackId, _, _):
+            "/boards/\(boardId)/stacks/\(stackId)"
         case .cards(let stackId):
             "/stacks/\(stackId)/cards"
         case .card(let id):
@@ -124,6 +127,16 @@ enum Router {
                 , options: [])
 
         case .createStack(_, let title, let order):
+            let payload: [String: Any?] = [
+                "title": title,
+                "order": order
+            ]
+            
+            return try? JSONSerialization.data(
+                withJSONObject: payload.compactMapValues { $0 }
+                , options: [])
+
+        case .updateStack(_, _, let title, let order):
             let payload: [String: Any?] = [
                 "title": title,
                 "order": order

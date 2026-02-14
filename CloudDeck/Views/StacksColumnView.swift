@@ -17,6 +17,7 @@ struct StacksColumnView: View {
     @Query private var cards: [Card]
 
     @State private var showNewStackSheet: Bool = false
+    @State private var stackToShowDetails: Stack? = nil
 
     init(boardID: Int?, selectedStackID: Binding<Int?>) {
         self.boardID = boardID
@@ -44,7 +45,6 @@ struct StacksColumnView: View {
 
     var body: some View {
         List(stacks, selection: $selectedStackID) { stack in
-            let _ = print(stack.order)
             VStack(alignment: .leading) {
                 Text(stack.title)
 
@@ -52,7 +52,22 @@ struct StacksColumnView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            .tag(stack.id)        }
+            .tag(stack.id)
+            .contextMenu {
+                Button {
+                    stackToShowDetails = stack
+                } label: {
+                    Label("Edit", systemImage: "pencil")
+                }
+                Button(role: .destructive) {
+                    Task {
+                        //                        try? await deckAPI.deleteBoard(boardId: board.id)
+                    }
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
+        }
         .navigationTitle(boardTitle)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
@@ -66,5 +81,9 @@ struct StacksColumnView: View {
         .sheet(isPresented: $showNewStackSheet) {
             NewStackSheet(boardId: boardID ?? 0)
         }
+        .sheet(item: $stackToShowDetails) { stack in
+            EditStackSheet(stack: stack)
+        }
+
     }
 }

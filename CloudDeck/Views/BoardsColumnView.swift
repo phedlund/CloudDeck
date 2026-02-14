@@ -40,7 +40,6 @@ struct BoardsColumnView: View {
                 } label: {
                     Label("Delete", systemImage: "trash")
                 }
-
             }
         }
         .navigationTitle("Boards")

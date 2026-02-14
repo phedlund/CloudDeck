@@ -16,7 +16,7 @@ struct EditStackSheet: View {
 
     @FocusState private var isTextFieldFocused: Bool
 
-    let boardId: Int
+    var stack: Stack
 
     var body: some View {
         NavigationStack {
@@ -32,6 +32,7 @@ struct EditStackSheet: View {
             }
             .navigationTitle("Edit Stack")
             .task {
+                title = stack.title
                 isTextFieldFocused = true
             }
             .toolbar {
@@ -39,7 +40,7 @@ struct EditStackSheet: View {
                     Button(role: .confirm) {
                         Task {
                             isSaving = true
-//                            try? await deckAPI.createStack(boardId: boardId, title: title, order: 999)
+                            try? await deckAPI.updateStack(boardId: stack.boardId, stackId: stack.id, title: title, order: stack.order)
                             dismiss()
                         }
                     }
