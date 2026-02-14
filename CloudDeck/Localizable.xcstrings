@@ -10,6 +10,9 @@
     "Actions" : {
 
     },
+    "Add Label" : {
+
+    },
     "Boards" : {
 
     },
@@ -69,10 +72,22 @@
     "Created %@" : {
 
     },
+    "Delete" : {
+
+    },
     "Description" : {
 
     },
+    "Edit" : {
+
+    },
+    "Edit Board" : {
+
+    },
     "Enter your Nextcloud server address" : {
+
+    },
+    "Labels" : {
 
     },
     "Log Out" : {

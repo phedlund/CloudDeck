@@ -15,6 +15,7 @@ struct BoardsColumnView: View {
     @Binding var showSettings: Bool
 
     @State private var showNewBoardSheet: Bool = false
+    @State private var boardToShowDetails: Board? = nil
 
     @Query(
         filter: #Predicate<Board> { !$0.archived },
@@ -30,6 +31,21 @@ struct BoardsColumnView: View {
                 Circle().fill(Color(hex: board.color) ?? .secondary)
             }
             .tag(board.id)
+            .contextMenu {
+                Button {
+                    boardToShowDetails = board
+                } label: {
+                    Label("Edit", systemImage: "pencil")
+                }
+                Button(role: .destructive) {
+                    Task {
+                        //                    await newsModel.toggleItemStarred(item: item)
+                    }
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+
+            }
         }
         .navigationTitle("Boards")
         .refreshable {
@@ -58,6 +74,9 @@ struct BoardsColumnView: View {
         }
         .sheet(isPresented: $showNewBoardSheet) {
             NewBoardSheet()
+        }
+        .sheet(item: $boardToShowDetails) { board in
+            EditBoardSheet(board: board)
         }
     }
 
