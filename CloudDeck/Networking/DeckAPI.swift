@@ -258,6 +258,22 @@ final class DeckAPI {
         }
     }
 
+    func deleteStack(boardId: Int, stackId: Int) async throws {
+        let request = try Router.deleteStack(boardId: boardId, stackId: stackId).urlRequest()
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        await backgroundActor.deleteStack(stackId: stackId)
+    }
+
     func createCard(boardId: Int, stackId: Int, title: String, description: String? = nil) async throws {
         let request = try Router.createCard(
             boardId: boardId,

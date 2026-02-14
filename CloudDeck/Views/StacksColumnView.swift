@@ -9,6 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct StacksColumnView: View {
+    @Environment(DeckAPI.self) private var deckAPI
+
     let boardID: Int?
     @Binding var selectedStackID: Int?
 
@@ -61,7 +63,7 @@ struct StacksColumnView: View {
                 }
                 Button(role: .destructive) {
                     Task {
-                        //                        try? await deckAPI.deleteBoard(boardId: board.id)
+                        try? await deckAPI.deleteStack(boardId: stack.boardId, stackId: stack.id)
                     }
                 } label: {
                     Label("Delete", systemImage: "trash")
