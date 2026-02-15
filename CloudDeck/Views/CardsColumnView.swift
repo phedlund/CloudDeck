@@ -13,6 +13,7 @@ struct SheetItem: Identifiable {
 }
 
 struct CardsColumnView: View {
+    @Environment(DeckAPI.self) private var deckAPI
     let stackID: Int?
     @State private var activeSheet: SheetItem?
     @State private var showNewCardSheet = false
@@ -37,12 +38,15 @@ struct CardsColumnView: View {
     }
 
     var body: some View {
-        List(cards) { card in
-            CardRow(card: card)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    activeSheet = SheetItem(id: card.id)
-                }
+        List {
+            ForEach(cards, id: \.self) { card in
+                CardRow(card: card)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        activeSheet = SheetItem(id: card.id)
+                    }
+            }
+            .onMove(perform: move)
         }
         .navigationTitle(stackTitle)
         .sheet(item: $activeSheet) {
@@ -64,10 +68,19 @@ struct CardsColumnView: View {
                 NewCardSheet(boardID: stack.boardId, stackID: stack.id)
             }
         }
-
     }
-}
 
-extension Int: @retroactive Identifiable {
-    public var id: Self { self }
+    func move(from source: IndexSet, to destination: Int) {
+        var revisedCards = cards
+        revisedCards.move(fromOffsets: source, toOffset: destination)
+        for reverseIndex in stride(from: revisedCards.count - 1, through: 0, by: -1) {
+            revisedCards[reverseIndex].order = reverseIndex
+        }
+        for card in revisedCards {
+            Task {
+                try? await self.deckAPI.updateCard(card)
+            }
+        }
+    }
+
 }
