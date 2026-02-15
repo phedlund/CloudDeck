@@ -79,6 +79,13 @@ extension DeckModelActor {
         }
     }
 
+    func deleteCard(cardId: Int) {
+        if let card = fetchCard(id: cardId) {
+            modelContext.delete(card)
+            try? modelContext.save()
+        }
+    }
+
     private func reconcileCards(stackID: Int, cardDTOs: [CardDTO]) throws {
 
         var serverIDs = Set<Int>()

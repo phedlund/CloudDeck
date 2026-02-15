@@ -414,6 +414,21 @@ final class DeckAPI {
         try await backgroundActor.insertNewCard(from: cardDTO)
     }
 
+    func deleteCard(boardId: Int, stackId: Int, cardId: Int) async throws {
+        let request = try Router.deleteCard(boardId: boardId, stackId: stackId, cardId: cardId).urlRequest()
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        await backgroundActor.deleteCard(cardId: cardId)
+    }
+
     func assignCardLabel(card: Card, label: DeckLabel) async throws {
 
         let request = try Router.assignLabel(

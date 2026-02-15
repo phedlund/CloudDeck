@@ -45,6 +45,22 @@ struct CardsColumnView: View {
                     .onTapGesture {
                         activeSheet = SheetItem(id: card.id)
                     }
+                    .contextMenu {
+                        Button {
+//                            stackToShowDetails = stack
+                        } label: {
+                            Label("Archive", systemImage: "archivebox")
+                        }
+                        .disabled(true)
+                        Button(role: .destructive) {
+                            Task {
+                                try? await deckAPI.deleteCard(boardId: card.stack?.boardId ?? 0, stackId: card.stack?.id ?? 0, cardId: card.id)
+                            }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+
             }
             .onMove(perform: move)
         }
