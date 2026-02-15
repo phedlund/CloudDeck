@@ -192,6 +192,29 @@ final class DeckAPI {
         try await getBoardDetails(boardIDs: [boardDTO.id])
     }
 
+    func updateBoard(boardId: Int, title: String, color: String, archived: Bool) async throws {
+        let request = try Router.updateBoard(id: boardId, title: title, color: color, archived: archived)
+            .urlRequest()
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+        if let boardDTO = try? decoder.decode(BoardDetailDTO.self, from: data) {
+            await backgroundActor.insert(boardDTO)
+            try? await backgroundActor.save()
+        }
+
+    }
+
     func deleteBoard(boardId: Int) async throws {
         let request = try Router.deleteBoard(id: boardId)
             .urlRequest()

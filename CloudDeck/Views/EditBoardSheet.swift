@@ -82,7 +82,7 @@ struct EditBoardSheet: View {
                     Button(role: .confirm) {
                         Task {
                             isSaving = true
-//                            try? await deckAPI.createBoard(title: title, colorHex: colorHex)
+                            try? await deckAPI.updateBoard(boardId: board.id, title: title, color: colorHex, archived: board.archived)
                             dismiss()
                         }
                     }
