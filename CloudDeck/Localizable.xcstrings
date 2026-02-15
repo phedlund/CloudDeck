@@ -16,6 +16,15 @@
     "Archive" : {
 
     },
+    "Archive all cards" : {
+
+    },
+    "Archive board" : {
+
+    },
+    "Assign to me" : {
+
+    },
     "Boards" : {
 
     },
@@ -99,7 +108,13 @@
     "Log Out" : {
 
     },
+    "Mark as done" : {
+
+    },
     "Modified %@" : {
+
+    },
+    "Move/Copy" : {
 
     },
     "New Board" : {

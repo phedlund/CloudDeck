@@ -33,6 +33,12 @@ struct BoardsColumnView: View {
                 } label: {
                     Label("Edit", systemImage: "pencil")
                 }
+                Button {
+//
+                } label: {
+                    Label("Archive board", systemImage: "archivebox")
+                }
+                .disabled(true)
                 Button(role: .destructive) {
                     Task {
                         try? await deckAPI.deleteBoard(boardId: board.id)

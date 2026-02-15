@@ -47,7 +47,25 @@ struct CardsColumnView: View {
                     }
                     .contextMenu {
                         Button {
-//                            stackToShowDetails = stack
+//
+                        } label: {
+                            Label("Assign to me", systemImage: "person")
+                        }
+                        .disabled(true)
+                        Button {
+//
+                        } label: {
+                            Label("Mark as done", systemImage: "checkmark")
+                        }
+                        .disabled(true)
+                        Button {
+//
+                        } label: {
+                            Label("Move/Copy", systemImage: "square.and.arrow.up.on.square")
+                        }
+                        .disabled(true)
+                        Button {
+//
                         } label: {
                             Label("Archive", systemImage: "archivebox")
                         }
@@ -60,7 +78,6 @@ struct CardsColumnView: View {
                             Label("Delete", systemImage: "trash")
                         }
                     }
-
             }
             .onMove(perform: move)
         }
