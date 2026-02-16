@@ -13,7 +13,9 @@ struct SheetItem: Identifiable {
 }
 
 struct CardsColumnView: View {
+    @Environment(\.modelContext) private var modelContext
     @Environment(DeckAPI.self) private var deckAPI
+    @Environment(AuthenticationManager.self) private var authManager
     let stackID: Int?
     @State private var activeSheet: SheetItem?
     @State private var showNewCardSheet = false
@@ -47,11 +49,25 @@ struct CardsColumnView: View {
                     }
                     .contextMenu {
                         Button {
-//
+                            if let username = authManager.currentAccount()?.username {
+                                Task {
+                                    let backgroundActor = DeckModelActor(modelContainer: modelContext.container)
+                                    if let stack = await backgroundActor.fetchStack(id: card.stackId) {
+                                        if let board = await backgroundActor.fetchBoard(id: stack.boardId),
+                                           let me = board.users.filter(
+                                            { $0.uid == username }
+                                           ).first {
+
+                                            try? await deckAPI.assignUser(card: card, user: me)
+                                        }
+
+                                    }
+                                }
+                            }
                         } label: {
                             Label("Assign to me", systemImage: "person")
                         }
-                        .disabled(true)
+//                        .disabled(true)
                         Button {
                             Task {
                                 try? await deckAPI.setCardDone(card: card, done: true)

@@ -156,7 +156,7 @@ extension DeckModelActor {
 
     // MARK: - Fetch helpers
 
-    private func fetchBoard(id: Int) -> Board? {
+    func fetchBoard(id: Int) -> Board? {
         let descriptor = FetchDescriptor<Board>(
             predicate: #Predicate { $0.id == id },
             sortBy: []
@@ -164,7 +164,7 @@ extension DeckModelActor {
         return try? modelContext.fetch(descriptor).first
     }
 
-    private func fetchStack(id: Int) -> Stack? {
+    func fetchStack(id: Int) -> Stack? {
         let descriptor = FetchDescriptor<Stack>(
             predicate: #Predicate { $0.id == id },
             sortBy: []
