@@ -340,7 +340,7 @@ final class DeckAPI {
             owner: card.owner.uid,
             order: card.order,
             duedate: dueDateString,
-            archived: false,
+            archived: card.archived,
             done: doneString
         ).urlRequest()
 
@@ -359,8 +359,12 @@ final class DeckAPI {
         try await backgroundActor.insertNewCard(from: cardDTO)
     }
 
-
     func setCardDone(card: Card, done: Bool) async throws {
+
+        var dueDateString: String?
+        if let dueDate = card.dueDate {
+           dueDateString = iso.string(from: dueDate)
+        }
 
         var doneString: String?
         if done {
@@ -376,7 +380,7 @@ final class DeckAPI {
             type: card.type,
             owner: card.owner.uid,
             order: card.order,
-            duedate: nil,
+            duedate: dueDateString,
             archived: false,
             done: doneString
         ).urlRequest()
@@ -418,12 +422,72 @@ final class DeckAPI {
             owner: card.owner.uid,
             order: card.order,
             duedate: dueDateString,
-            archived: false,
+            archived: card.archived,
             done: doneString
         ).urlRequest()
 
         let (data, response) = try await URLSession.shared.data(for: request)
 
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard let http = response as? HTTPURLResponse,
+              http.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
+        try await backgroundActor.insertNewCard(from: cardDTO)
+    }
+
+    func setCardArchived(card: Card, archived: Bool) async throws {
+
+        var dueDateString: String?
+        if let dueDate = card.dueDate {
+           dueDateString = iso.string(from: dueDate)
+        }
+
+        var doneString: String?
+        if let doneAt = card.doneAt {
+            doneString = iso.string(from: doneAt)
+        }
+
+        let request = try Router.updateCard(
+            boardId: card.stack?.boardId ?? 0,
+            stackId: card.stackId,
+            cardId: card.id,
+            title: card.title,
+            description: card.cardDescription,
+            type: card.type,
+            owner: card.owner.uid,
+            order: card.order,
+            duedate: dueDateString,
+            archived: archived,
+            done: doneString
+        ).urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard let http = response as? HTTPURLResponse,
+              http.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
+        try await backgroundActor.insertNewCard(from: cardDTO)
+    }
+
+    // New API
+    func archiveCard(boardId: Int, stackId: Int, cardId: Int) async throws {
+        let request = try Router.archiveCard(boardId: boardId, stackId: stackId, cardId: cardId).urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
         if let body = String(data: data, encoding: .utf8) {
             print("SERVER BODY:", body)
         }

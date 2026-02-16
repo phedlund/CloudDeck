@@ -41,6 +41,7 @@ enum Router {
 
     case createCard(boardId: Int, stackId: Int, title: String, description: String?)
     case updateCard(boardId: Int, stackId: Int, cardId: Int, title: String?, description: String?, type: String, owner: String, order: Int?, duedate: String?, archived: Bool?, done: String?)
+    case archiveCard(boardId: Int, stackId: Int, cardId: Int)
     case deleteCard(boardId: Int, stackId: Int, cardId: Int)
 
     case assignLabel(boardId: Int, stackId: Int, cardId: Int, labelId: Int)
@@ -57,7 +58,7 @@ enum Router {
             return .get
         case .createBoard, .createStack, .createCard:
             return .post
-        case .updateBoard, .updateStack, .updateCard, .assignLabel, .removeLabel, .assignUser, .unassignUser:
+        case .updateBoard, .updateStack, .updateCard, .archiveCard, .assignLabel, .removeLabel, .assignUser, .unassignUser:
             return .put
         case .deleteBoard, .deleteStack, .deleteCard:
             return .delete
@@ -92,6 +93,8 @@ enum Router {
             "/boards/\(boardId)/stacks/\(stackId)/cards"
         case .updateCard(let boardId, let stackId, let cardId, _, _, _, _, _, _, _, _):
             "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)"
+        case .archiveCard(let boardId, let stackId, let cardId):
+            "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)/archive"
         case .deleteCard(let boardId, let stackId, let cardId):
             "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)"
         case .assignLabel(let boardId, let stackId, let cardId, _):

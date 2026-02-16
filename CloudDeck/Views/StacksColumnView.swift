@@ -41,7 +41,7 @@ struct StacksColumnView: View {
     }
 
     private var cardCounts: [Int: Int] {
-        Dictionary(grouping: cards, by: \.stackId)
+        Dictionary(grouping: cards.filter( { $0.archived == false }), by: \.stackId)
             .mapValues(\.count)
     }
 

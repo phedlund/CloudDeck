@@ -25,7 +25,7 @@ struct CardsColumnView: View {
         self.stackID = stackID
 
         if let stackID {
-            _cards = Query(filter: #Predicate<Card> { $0.stackId == stackID }, sort: \.order)
+            _cards = Query(filter: #Predicate<Card> { $0.stackId == stackID && !$0.archived }, sort: \.order)
             _stacks = Query(filter: #Predicate<Stack> { $0.id == stackID } )
         } else {
             _cards = Query(filter: #Predicate<Card> { _ in false })
@@ -53,7 +53,9 @@ struct CardsColumnView: View {
                         }
                         .disabled(true)
                         Button {
-//
+                            Task {
+                                try? await deckAPI.setCardDone(card: card, done: true)
+                            }
                         } label: {
                             Label("Mark as done", systemImage: "checkmark")
                         }
@@ -65,11 +67,13 @@ struct CardsColumnView: View {
                         }
                         .disabled(true)
                         Button {
-//
+                            Task {
+                                try? await deckAPI.setCardArchived(card: card, archived: true)
+                            }
                         } label: {
                             Label("Archive", systemImage: "archivebox")
                         }
-                        .disabled(true)
+                        .disabled(card.archived)
                         Button(role: .destructive) {
                             Task {
                                 try? await deckAPI.deleteCard(boardId: card.stack?.boardId ?? 0, stackId: card.stack?.id ?? 0, cardId: card.id)
@@ -87,13 +91,11 @@ struct CardsColumnView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-//                if let _ = selectedStackID {
-                    Button {
-                        showNewCardSheet = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-//                }
+                Button {
+                    showNewCardSheet = true
+                } label: {
+                    Image(systemName: "plus")
+                }
             }
         }
         .sheet(isPresented: $showNewCardSheet) {
