@@ -37,6 +37,16 @@ final class Permissions {
         self.canManage = canManage
         self.canShare = canShare
     }
+
+    convenience init(dto: PermissionsDTO) {
+        self.init(
+            canRead: dto.canRead,
+            canEdit: dto.canEdit,
+            canManage: dto.canManage,
+            canShare: dto.canShare
+        )
+    }
+
 }
 
 struct ACLItemDTO: Decodable {
@@ -53,6 +63,13 @@ final class ACLItem {
         self.uid = uid
         self.permission = permission
     }
+
+    convenience init(dto: ACLItemDTO) {
+        self.init(
+            uid: dto.uid,
+            permission: dto.permission
+        )
+    }
 }
 
 struct ActiveSessionDTO: Decodable {
@@ -68,6 +85,13 @@ final class ActiveSession {
     init(userId: String, lastSeen: Date) {
         self.userId = userId
         self.lastSeen = lastSeen
+    }
+
+    convenience init(dto: ActiveSessionDTO) {
+        self.init(
+            userId: dto.userId,
+            lastSeen: dto.lastSeen
+        )
     }
 }
 

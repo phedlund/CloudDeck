@@ -62,7 +62,7 @@ final class Card {
     var doneAt: Date?
     var deletedAt: Date?
 
-    var stack: Stack?
+    @Relationship(inverse: \Stack.cards) var stack: Stack?
 
     @Relationship(deleteRule: .noAction, inverse: \DeckLabel.card)
     var labels: [DeckLabel]

@@ -44,7 +44,7 @@ final class Stack {
     var eTag: String?
 
     @Relationship(inverse: \Board.stacks) var board: Board?
-    @Relationship(deleteRule: .cascade, inverse: \Card.stack) var cards: [Card]
+    @Relationship(deleteRule: .cascade) var cards: [Card]
 
     init(
         id: Int,

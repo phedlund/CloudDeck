@@ -19,6 +19,7 @@ struct CardsColumnView: View {
     let stackID: Int?
     @State private var activeSheet: SheetItem?
     @State private var showNewCardSheet = false
+    @State private var cardToMove: Card? = nil
 
     @Query private var cards: [Card]
     @Query private var stacks: [Stack]
@@ -77,11 +78,11 @@ struct CardsColumnView: View {
                         }
                         .disabled(true)
                         Button {
-//
+                            cardToMove = card
                         } label: {
                             Label("Move/Copy", systemImage: "square.and.arrow.up.on.square")
                         }
-                        .disabled(true)
+                        .disabled(false)
                         Button {
                             Task {
                                 try? await deckAPI.setCardArchived(card: card, archived: true)
@@ -104,6 +105,9 @@ struct CardsColumnView: View {
         .navigationTitle(stackTitle)
         .sheet(item: $activeSheet) {
             CardDetailSheet(cardID: $0.id)
+        }
+        .sheet(item: $cardToMove) {
+            MoveCardSheet(card: $0)
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

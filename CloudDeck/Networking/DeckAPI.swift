@@ -131,7 +131,7 @@ final class DeckAPI {
                     let decoder = JSONDecoder()
                     decoder.dateDecodingStrategy = .secondsSince1970
                     if let boardDTO = try? decoder.decode(BoardDetailDTO.self, from: data) {
-                        await backgroundActor.insert(boardDTO)
+                        try? await backgroundActor.insert(boardDTO)
                         try? await backgroundActor.save()
                     }
                 case 304:
@@ -209,7 +209,7 @@ final class DeckAPI {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .secondsSince1970
         if let boardDTO = try? decoder.decode(BoardDetailDTO.self, from: data) {
-            await backgroundActor.insert(boardDTO)
+            try await backgroundActor.insert(boardDTO)
             try? await backgroundActor.save()
         }
 
@@ -333,6 +333,47 @@ final class DeckAPI {
         let request = try Router.updateCard(
             boardId: card.stack?.boardId ?? 0,
             stackId: card.stackId,
+            cardId: card.id,
+            title: card.title,
+            description: card.cardDescription,
+            type: card.type,
+            owner: card.owner.uid,
+            order: card.order,
+            duedate: dueDateString,
+            archived: card.archived,
+            done: doneString
+        ).urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard let http = response as? HTTPURLResponse,
+              http.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
+        try await backgroundActor.insertNewCard(from: cardDTO)
+    }
+
+    func moveCard(_ card: Card, newBoardId: Int, newStackId: Int) async throws {
+
+        var dueDateString: String?
+        if let dueDate = card.dueDate {
+           dueDateString = iso.string(from: dueDate)
+        }
+
+        var doneString: String?
+        if let doneAt = card.doneAt {
+            doneString = iso.string(from: doneAt)
+        }
+
+        let request = try Router.updateCard(
+            boardId: newBoardId,
+            stackId: newStackId,
             cardId: card.id,
             title: card.title,
             description: card.cardDescription,

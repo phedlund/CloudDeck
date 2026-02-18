@@ -40,9 +40,10 @@ extension DeckModelActor {
         )
     }
 
-    func insert(_ dto: BoardDetailDTO) {
+    func insert(_ dto: BoardDetailDTO) throws {
         let board = fetchBoard(id: dto.id)
         board?.applyDetail(from: dto)
+        try modelContext.save()
     }
 
     func deleteBoard(boardId: Int) {

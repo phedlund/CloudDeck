@@ -110,8 +110,7 @@ final class Board {
     @Relationship(deleteRule: .nullify)
     var users: [User] = []
 
-    @Relationship(deleteRule: .cascade)
-    var stacks: [Stack] = []
+    @Relationship(deleteRule: .cascade) var stacks: [Stack] = []
 
     @Relationship(deleteRule: .cascade)
     var labels: [DeckLabel] = []
@@ -198,14 +197,18 @@ extension Board {
     }
 
     func applyDetail(from dto: BoardDetailDTO) {
+
+        let stackModels = dto.stacks.map { Stack(dto: $0) }
+        let labelModels = dto.labels.map { DeckLabel(dto: $0) }
+
         title = dto.title
         color = dto.color
         archived = dto.archived
         deletedAt = dto.deletedAt
         lastModified = Date(timeIntervalSince1970: TimeInterval(dto.lastModified))
         eTag = dto.eTag
-        stacks = dto.stacks.map(Stack.init)
-        labels = dto.labels.map(DeckLabel.init)
+        stacks = stackModels
+        labels = labelModels
         permissions = Permissions(canRead: dto.permissions.canRead,
                                   canEdit: dto.permissions.canEdit,
                                   canManage: dto.permissions.canManage,
