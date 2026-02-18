@@ -96,8 +96,15 @@
     "Edit Board" : {
 
     },
-    "Edit Stack" : {
-
+    "Edit List" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit List"
+          }
+        }
+      }
     },
     "Enter your Nextcloud server address" : {
 
@@ -126,8 +133,19 @@
     "New Card" : {
 
     },
-    "New Stack" : {
+    "New List" : {
 
+    },
+    "New List" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New List"
+          }
+        }
+      }
     },
     "Owner" : {
 
@@ -135,8 +153,15 @@
     "Select" : {
 
     },
-    "Select board and stack" : {
-
+    "Select board and list" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select board and list"
+          }
+        }
+      }
     },
     "Server" : {
 
@@ -147,8 +172,15 @@
     "Settings" : {
 
     },
-    "Stack" : {
-
+    "List" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List"
+          }
+        }
+      }
     },
     "This will remove your account from this device. Your data on the server will not be affected." : {
 

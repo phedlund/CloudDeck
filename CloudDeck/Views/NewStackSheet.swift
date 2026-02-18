@@ -30,7 +30,7 @@ struct NewStackSheet: View {
                     EmptyView()
                 }
             }
-            .navigationTitle("New Stack")
+            .navigationTitle("New List")
             .task {
                 isTextFieldFocused = true
             }

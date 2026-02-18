@@ -37,7 +37,7 @@ struct StacksColumnView: View {
     }
 
     private var boardTitle: String {
-        boards.first?.title ?? "Stacks"
+        boards.first?.title ?? "Lists"
     }
 
     private var cardCounts: [Int: Int] {
