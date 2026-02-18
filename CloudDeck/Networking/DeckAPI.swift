@@ -53,15 +53,6 @@ final class DeckAPI {
         backgroundSession = URLSession(configuration: backgroundSessionConfig)
     }
 
-
-    private func syncRequests() async throws -> SyncRequests {
-        let boardRequest = try Router.boards.urlRequest()
-        let stackRequest = try Router.stacks(boardId: 1).urlRequest()
-        let cardRequest = try Router.cards(stackId: 1).urlRequest()
-
-        return SyncRequests(boardRequest: boardRequest, stackRequest: stackRequest, cardRequest: cardRequest)
-    }
-
     func sync() async throws /*-> NewsStatusDTO? */ {
 //        syncState = .started
 //        let hasItems = await backgroundActor.hasItems()
@@ -84,15 +75,11 @@ final class DeckAPI {
 
     private func syncBoards() async throws -> [Int] {
         var result = [Int]()
-        let requests = try await syncRequests()
-        let (data, response) = try await URLSession.shared.data(for: requests.boardRequest)
+        let boardRequest = try Router.boards.urlRequest()
+        let (data, response) = try await URLSession.shared.data(for: boardRequest)
         if let response = response as? HTTPURLResponse {
             switch response.statusCode {
             case 200:
-//                let headers = response.allHeaderFields
-//                for header in headers {
-//                    print("\(header.key): \(header.value)")
-//                }
                 if let etag = response.value(forHTTPHeaderField: Constants.Settings.etag) {
                     UserDefaults.standard.set(etag, forKey: Constants.Settings.etag)
                 }
@@ -252,7 +239,6 @@ final class DeckAPI {
             try await backgroundActor.addStack(deckStackDTO)
             try? await backgroundActor.save()
         }
-
     }
 
     func updateStack(boardId: Int, stackId: Int, title: String, order: Int) async throws {
