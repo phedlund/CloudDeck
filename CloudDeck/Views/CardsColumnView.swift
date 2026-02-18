@@ -76,7 +76,7 @@ struct CardsColumnView: View {
                         } label: {
                             Label("Mark as done", systemImage: "checkmark")
                         }
-                        .disabled(true)
+                        .disabled(card.doneAt != nil)
                         Button {
                             cardToMove = card
                         } label: {
