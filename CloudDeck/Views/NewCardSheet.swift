@@ -42,7 +42,7 @@ struct NewCardSheet: View {
                     Button(role: .confirm) {
                         Task {
                             isSaving = true
-                            try? await deckAPI.createCard(
+                            _ = try? await deckAPI.createCard(
                                 boardId: boardID,
                                 stackId: stackID,
                                 title: title,

@@ -297,7 +297,7 @@ final class DeckAPI {
         await backgroundActor.deleteStack(stackId: stackId)
     }
 
-    func createCard(boardId: Int, stackId: Int, title: String, description: String? = nil) async throws {
+    func createCard(boardId: Int, stackId: Int, title: String, description: String? = nil) async throws -> CardDTO {
         let request = try Router.createCard(
             boardId: boardId,
             stackId: stackId,
@@ -316,6 +316,7 @@ final class DeckAPI {
         }
         let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
         try await backgroundActor.insertNewCard(from: cardDTO)
+        return cardDTO
     }
 
     func updateCard(_ card: Card) async throws {
@@ -382,6 +383,48 @@ final class DeckAPI {
             order: card.order,
             duedate: dueDateString,
             archived: card.archived,
+            done: doneString
+        ).urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard let http = response as? HTTPURLResponse,
+              http.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
+        try await backgroundActor.insertNewCard(from: cardDTO)
+    }
+
+    func copyCard(_ card: Card, newBoardId: Int, newStackId: Int) async throws {
+        let newCardDTO = try await createCard(boardId: newBoardId, stackId: newStackId, title: card.title, description: card.cardDescription)
+
+        var dueDateString: String?
+        if let dueDate = card.dueDate {
+           dueDateString = iso.string(from: dueDate)
+        }
+
+        var doneString: String?
+        if let doneAt = card.doneAt {
+            doneString = iso.string(from: doneAt)
+        }
+
+        let request = try Router.updateCard(
+            boardId: newBoardId,
+            stackId: newStackId,
+            cardId: newCardDTO.id,
+            title: newCardDTO.title,
+            description: newCardDTO.description,
+            type: newCardDTO.type,
+            owner: newCardDTO.owner.uid,
+            order: newCardDTO.order,
+            duedate: dueDateString,
+            archived: newCardDTO.archived,
             done: doneString
         ).urlRequest()
 

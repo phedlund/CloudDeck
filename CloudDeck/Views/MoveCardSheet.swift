@@ -60,7 +60,11 @@ struct MoveCardSheet: View {
                         Task {
                             if let selectedBoardID, let selectedStackID {
                                 isSaving = true
-                                try? await deckAPI.moveCard(card, newBoardId: selectedBoardID, newStackId: selectedStackID)
+                                if createACopy {
+                                    try? await deckAPI.copyCard(card, newBoardId: selectedBoardID, newStackId: selectedStackID)
+                                } else {
+                                    try? await deckAPI.moveCard(card, newBoardId: selectedBoardID, newStackId: selectedStackID)
+                                }
                                 dismiss()
                             }
                         }
