@@ -25,7 +25,7 @@ where Data.Element: Identifiable {
     }
 
     var body: some View {
-        FlowLayout(spacing: 6) {
+        ChipFlowLayout(spacing: 6) {
             ForEach(data) { element in
                 content(element)
             }

@@ -4,6 +4,9 @@
     "" : {
 
     },
+    "%@" : {
+
+    },
     "Account" : {
 
     },
@@ -97,6 +100,7 @@
 
     },
     "Edit List" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -106,11 +110,25 @@
         }
       }
     },
+    "Edit Stack" : {
+
+    },
     "Enter your Nextcloud server address" : {
 
     },
     "Labels" : {
 
+    },
+    "List" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List"
+          }
+        }
+      }
     },
     "Log Out" : {
 
@@ -136,17 +154,6 @@
     "New List" : {
 
     },
-    "New List" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New List"
-          }
-        }
-      }
-    },
     "Owner" : {
 
     },
@@ -154,6 +161,7 @@
 
     },
     "Select board and list" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -162,6 +170,9 @@
           }
         }
       }
+    },
+    "Select board and stack" : {
+
     },
     "Server" : {
 
@@ -172,15 +183,8 @@
     "Settings" : {
 
     },
-    "List" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "List"
-          }
-        }
-      }
+    "Stack" : {
+
     },
     "This will remove your account from this device. Your data on the server will not be affected." : {
 

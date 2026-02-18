@@ -41,67 +41,72 @@ struct CardsColumnView: View {
     }
 
     var body: some View {
-        List {
-            ForEach(cards, id: \.self) { card in
-                CardRow(card: card)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        activeSheet = SheetItem(id: card.id)
-                    }
-                    .contextMenu {
-                        Button {
-                            if let username = authManager.currentAccount()?.username {
-                                Task {
-                                    let backgroundActor = DeckModelActor(modelContainer: modelContext.container)
-                                    if let stack = await backgroundActor.fetchStack(id: card.stackId) {
-                                        if let board = await backgroundActor.fetchBoard(id: stack.boardId),
-                                           let me = board.users.filter(
-                                            { $0.uid == username }
-                                           ).first {
+        ScrollView {
+            LazyVStack(spacing: 12) {
+                ForEach(cards, id: \.self) { card in
+                    CardRow(card: card)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            activeSheet = SheetItem(id: card.id)
+                        }
+                        .contextMenu {
+                            Button {
+                                if let username = authManager.currentAccount()?.username {
+                                    Task {
+                                        let backgroundActor = DeckModelActor(modelContainer: modelContext.container)
+                                        if let stack = await backgroundActor.fetchStack(id: card.stackId) {
+                                            if let board = await backgroundActor.fetchBoard(id: stack.boardId),
+                                               let me = board.users.filter(
+                                                { $0.uid == username }
+                                               ).first {
 
-                                            try? await deckAPI.assignUser(card: card, user: me)
+                                                try? await deckAPI.assignUser(card: card, user: me)
+                                            }
+
                                         }
-
                                     }
                                 }
+                            } label: {
+                                Label("Assign to me", systemImage: "person")
                             }
-                        } label: {
-                            Label("Assign to me", systemImage: "person")
-                        }
-//                        .disabled(true)
-                        Button {
-                            Task {
-                                try? await deckAPI.setCardDone(card: card, done: true)
+                            //                        .disabled(true)
+                            Button {
+                                Task {
+                                    try? await deckAPI.setCardDone(card: card, done: true)
+                                }
+                            } label: {
+                                Label("Mark as done", systemImage: "checkmark")
                             }
-                        } label: {
-                            Label("Mark as done", systemImage: "checkmark")
-                        }
-                        .disabled(card.doneAt != nil)
-                        Button {
-                            cardToMove = card
-                        } label: {
-                            Label("Move/Copy", systemImage: "square.and.arrow.up.on.square")
-                        }
-                        .disabled(false)
-                        Button {
-                            Task {
-                                try? await deckAPI.setCardArchived(card: card, archived: true)
+                            .disabled(card.doneAt != nil)
+                            Button {
+                                cardToMove = card
+                            } label: {
+                                Label("Move/Copy", systemImage: "square.and.arrow.up.on.square")
                             }
-                        } label: {
-                            Label("Archive", systemImage: "archivebox")
-                        }
-                        .disabled(card.archived)
-                        Button(role: .destructive) {
-                            Task {
-                                try? await deckAPI.deleteCard(boardId: card.stack?.boardId ?? 0, stackId: card.stack?.id ?? 0, cardId: card.id)
+                            .disabled(false)
+                            Button {
+                                Task {
+                                    try? await deckAPI.setCardArchived(card: card, archived: true)
+                                }
+                            } label: {
+                                Label("Archive", systemImage: "archivebox")
                             }
-                        } label: {
-                            Label("Delete", systemImage: "trash")
+                            .disabled(card.archived)
+                            Button(role: .destructive) {
+                                Task {
+                                    try? await deckAPI.deleteCard(boardId: card.stack?.boardId ?? 0, stackId: card.stack?.id ?? 0, cardId: card.id)
+                                }
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         }
-                    }
+                }
+                .onMove(perform: move)
             }
-            .onMove(perform: move)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
         }
+        .background(Color(.systemGroupedBackground))
         .navigationTitle(stackTitle)
         .sheet(item: $activeSheet) {
             CardDetailSheet(cardID: $0.id)
