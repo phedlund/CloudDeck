@@ -8,9 +8,6 @@
 import SwiftData
 import SwiftUI
 
-import SwiftUI
-import SwiftData
-
 struct ContentView: View {
     @Environment(DeckAPI.self) private var deckAPI
     @Environment(AuthenticationManager.self) private var authManager
