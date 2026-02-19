@@ -20,33 +20,43 @@ struct BoardsColumnView: View {
     @Query(filter: #Predicate<Board> { !$0.archived && $0.deletedAt == 0 }, sort: \.title) private var boards: [Board]
 
     var body: some View {
-        List(boards, selection: $selectedBoardID) { board in
-            Label {
-                Text(board.title)
-            } icon: {
-                Circle().fill(Color(hex: board.color) ?? .secondary)
-            }
-            .tag(board.id)
-            .contextMenu {
-                Button {
-                    boardToShowDetails = board
-                } label: {
-                    Label("Edit", systemImage: "pencil")
+        Group {
+            if boards.isEmpty {
+                ContentUnavailableView {
+                    Label("No Boards Available", systemImage: "list.dash")
+                } description: {
+                    Text("Tap the sync button \(Image(systemName: "arrow.clockwise")) to download your boards. Then select a board to show its lists.")
                 }
-                Button {
-                    Task {
-                        try? await deckAPI.updateBoard(boardId: board.id, title: board.title, color: board.color, archived: true)
+            } else {
+                List(boards, selection: $selectedBoardID) { board in
+                    Label {
+                        Text(board.title)
+                    } icon: {
+                        Circle().fill(Color(hex: board.color) ?? .secondary)
                     }
-                } label: {
-                    Label("Archive", systemImage: "archivebox")
-                }
-                .disabled(board.archived)
-                Button(role: .destructive) {
-                    Task {
-                        try? await deckAPI.deleteBoard(boardId: board.id)
+                    .tag(board.id)
+                    .contextMenu {
+                        Button {
+                            boardToShowDetails = board
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        Button {
+                            Task {
+                                try? await deckAPI.updateBoard(boardId: board.id, title: board.title, color: board.color, archived: true)
+                            }
+                        } label: {
+                            Label("Archive", systemImage: "archivebox")
+                        }
+                        .disabled(board.archived)
+                        Button(role: .destructive) {
+                            Task {
+                                try? await deckAPI.deleteBoard(boardId: board.id)
+                            }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
                     }
-                } label: {
-                    Label("Delete", systemImage: "trash")
                 }
             }
         }

@@ -154,6 +154,15 @@
     "New List" : {
 
     },
+    "No Boards Available" : {
+
+    },
+    "No Cards Available" : {
+
+    },
+    "No Lists Available" : {
+
+    },
     "Owner" : {
 
     },
@@ -184,6 +193,12 @@
 
     },
     "Stack" : {
+
+    },
+    "Tap the plus button %@ to add one." : {
+
+    },
+    "Tap the sync button %@ to download your boards. Then select a board to show its lists." : {
 
     },
     "This will remove your account from this device. Your data on the server will not be affected." : {

@@ -41,70 +41,80 @@ struct CardsColumnView: View {
     }
 
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(cards, id: \.self) { card in
-                    CardRow(card: card)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            activeSheet = SheetItem(id: card.id)
-                        }
-                        .contextMenu {
-                            Button {
-                                if let username = authManager.currentAccount()?.username {
-                                    Task {
-                                        let backgroundActor = DeckModelActor(modelContainer: modelContext.container)
-                                        if let stack = await backgroundActor.fetchStack(id: card.stackId) {
-                                            if let board = await backgroundActor.fetchBoard(id: stack.boardId),
-                                               let me = board.users.filter(
-                                                { $0.uid == username }
-                                               ).first {
+        Group {
+            if cards.isEmpty {
+                ContentUnavailableView {
+                    Label("No Cards Available", systemImage: "list.dash.header.rectangle")
+                } description: {
+                    Text("Tap the plus button \(Image(systemName: "plus")) to add one.")
+                }
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(cards, id: \.self) { card in
+                            CardRow(card: card)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    activeSheet = SheetItem(id: card.id)
+                                }
+                                .contextMenu {
+                                    Button {
+                                        if let username = authManager.currentAccount()?.username {
+                                            Task {
+                                                let backgroundActor = DeckModelActor(modelContainer: modelContext.container)
+                                                if let stack = await backgroundActor.fetchStack(id: card.stackId) {
+                                                    if let board = await backgroundActor.fetchBoard(id: stack.boardId),
+                                                       let me = board.users.filter(
+                                                        { $0.uid == username }
+                                                       ).first {
 
-                                                try? await deckAPI.assignUser(card: card, user: me)
+                                                        try? await deckAPI.assignUser(card: card, user: me)
+                                                    }
+
+                                                }
                                             }
-
                                         }
+                                    } label: {
+                                        Label("Assign to me", systemImage: "person")
+                                    }
+                                    //                        .disabled(true)
+                                    Button {
+                                        Task {
+                                            try? await deckAPI.setCardDone(card: card, done: true)
+                                        }
+                                    } label: {
+                                        Label("Mark as done", systemImage: "checkmark")
+                                    }
+                                    .disabled(card.doneAt != nil)
+                                    Button {
+                                        cardToMove = card
+                                    } label: {
+                                        Label("Move/Copy", systemImage: "square.and.arrow.up.on.square")
+                                    }
+                                    .disabled(false)
+                                    Button {
+                                        Task {
+                                            try? await deckAPI.setCardArchived(card: card, archived: true)
+                                        }
+                                    } label: {
+                                        Label("Archive", systemImage: "archivebox")
+                                    }
+                                    .disabled(card.archived)
+                                    Button(role: .destructive) {
+                                        Task {
+                                            try? await deckAPI.deleteCard(boardId: card.stack?.boardId ?? 0, stackId: card.stack?.id ?? 0, cardId: card.id)
+                                        }
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
                                     }
                                 }
-                            } label: {
-                                Label("Assign to me", systemImage: "person")
-                            }
-                            //                        .disabled(true)
-                            Button {
-                                Task {
-                                    try? await deckAPI.setCardDone(card: card, done: true)
-                                }
-                            } label: {
-                                Label("Mark as done", systemImage: "checkmark")
-                            }
-                            .disabled(card.doneAt != nil)
-                            Button {
-                                cardToMove = card
-                            } label: {
-                                Label("Move/Copy", systemImage: "square.and.arrow.up.on.square")
-                            }
-                            .disabled(false)
-                            Button {
-                                Task {
-                                    try? await deckAPI.setCardArchived(card: card, archived: true)
-                                }
-                            } label: {
-                                Label("Archive", systemImage: "archivebox")
-                            }
-                            .disabled(card.archived)
-                            Button(role: .destructive) {
-                                Task {
-                                    try? await deckAPI.deleteCard(boardId: card.stack?.boardId ?? 0, stackId: card.stack?.id ?? 0, cardId: card.id)
-                                }
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
                         }
+                        .onMove(perform: move)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                 }
-                .onMove(perform: move)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle(stackTitle)

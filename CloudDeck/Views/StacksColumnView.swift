@@ -46,33 +46,43 @@ struct StacksColumnView: View {
     }
 
     var body: some View {
-        List(stacks, selection: $selectedStackID) { stack in
-            VStack(alignment: .leading) {
-                Text(stack.title)
+        Group {
+            if stacks.isEmpty {
+                ContentUnavailableView {
+                    Label("No Lists Available", systemImage: "list.dash")
+                } description: {
+                    Text("Tap the plus button \(Image(systemName: "plus")) to add one.")
+                }
+            } else {
+                List(stacks, selection: $selectedStackID) { stack in
+                    VStack(alignment: .leading) {
+                        Text(stack.title)
 
-                Text(.cardCount(cardCounts[stack.id, default: 0]))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .tag(stack.id)
-            .contextMenu {
-                Button {
-                    stackToShowDetails = stack
-                } label: {
-                    Label("Edit", systemImage: "pencil")
-                }
-                Button {
-//
-                } label: {
-                    Label("Archive all cards", systemImage: "archivebox")
-                }
-                .disabled(true)
-                Button(role: .destructive) {
-                    Task {
-                        try? await deckAPI.deleteStack(boardId: stack.boardId, stackId: stack.id)
+                        Text(.cardCount(cardCounts[stack.id, default: 0]))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
-                } label: {
-                    Label("Delete", systemImage: "trash")
+                    .tag(stack.id)
+                    .contextMenu {
+                        Button {
+                            stackToShowDetails = stack
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        Button {
+                            //
+                        } label: {
+                            Label("Archive all cards", systemImage: "archivebox")
+                        }
+                        .disabled(true)
+                        Button(role: .destructive) {
+                            Task {
+                                try? await deckAPI.deleteStack(boardId: stack.boardId, stackId: stack.id)
+                            }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
                 }
             }
         }
