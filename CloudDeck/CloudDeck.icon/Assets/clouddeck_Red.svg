@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.0"
+   id="svg2"
+   height="406.33572"
+   width="406.33572"
+   sodipodi:docname="clouddeck_Red.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.1509307"
+     inkscape:cx="202.9354"
+     inkscape:cy="202.9354"
+     inkscape:window-width="2299"
+     inkscape:window-height="1186"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2" />
+  <defs
+     id="defs4">
+    <foreignObject
+       requiredExtensions="http://ns.adobe.com/AdobeIllustrator/10.0/"
+       x="0"
+       y="0"
+       width="1"
+       height="1"
+       id="foreignObject7" />
+    <linearGradient
+       id="RSSg"
+       y2="225.94"
+       x2="225.94"
+       y1="30.059999"
+       x1="30.059999"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         id="stop7713"
+         stop-color="#808080"
+         offset="0.0"
+         style="stop-color:#d40000;stop-opacity:1" />
+      <stop
+         id="stop7715"
+         stop-color="#929292"
+         offset="0.2785"
+         style="stop-color:#d40000;stop-opacity:1" />
+      <stop
+         id="stop7717"
+         stop-color="#9B9B9B"
+         offset="0.5"
+         style="stop-color:#ff0000;stop-opacity:1" />
+      <stop
+         id="stop7719"
+         stop-color="#919191"
+         offset="0.5871"
+         style="stop-color:#ff0000;stop-opacity:1" />
+      <stop
+         id="stop7721"
+         stop-color="#797979"
+         offset="0.8427"
+         style="stop-color:#d40000;stop-opacity:1" />
+      <stop
+         id="stop7723"
+         stop-color="#707070"
+         offset="1.0"
+         style="stop-color:#d40000;stop-opacity:1" />
+    </linearGradient>
+    <foreignObject
+       id="foreignObject7-0"
+       height="1"
+       width="1"
+       y="0"
+       x="0"
+       requiredExtensions="http://ns.adobe.com/AdobeIllustrator/10.0/" />
+    <linearGradient
+       xlink:href="#RSSg"
+       id="linearGradient5892"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.3671875,0,0,1.3671875,85.402894,-53.572239)"
+       x1="30.059999"
+       y1="30.059999"
+       x2="225.94"
+       y2="225.94" />
+  </defs>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="g1">
+    <rect
+       transform="rotate(20)"
+       id="rect7725"
+       y="-53.572159"
+       x="85.40284"
+       ry="75.195312"
+       rx="75.195312"
+       height="350"
+       width="350"
+       style="fill:#d40000;stroke-width:2.73438" />
+    <rect
+       transform="rotate(20)"
+       id="rect7727"
+       y="-46.736221"
+       x="92.238777"
+       ry="68.359375"
+       rx="68.359375"
+       height="336.32809"
+       width="336.32809"
+       style="fill:#ff0000;stroke-width:2.73438" />
+    <rect
+       transform="rotate(20)"
+       id="rect7729"
+       y="-39.900436"
+       x="99.074715"
+       ry="64.257805"
+       rx="64.257805"
+       height="322.65625"
+       width="322.65625"
+       style="fill:url(#linearGradient5892);stroke-width:2.73438" />
+    <g
+       id="g4"
+       transform="rotate(20,49.997171,273.13608)">
+      <rect
+         style="fill:#ffffff;stroke-width:0.843629"
+         id="rect1"
+         width="100"
+         height="100"
+         x="60"
+         y="45"
+         rx="10.810811"
+         ry="10.810811" />
+      <rect
+         style="fill:#ffffff;stroke-width:0.843629"
+         id="rect2"
+         width="100"
+         height="100"
+         x="180"
+         y="45"
+         rx="10.810811"
+         ry="10.810811" />
+      <rect
+         style="fill:#ffffff;stroke-width:0.843629"
+         id="rect3"
+         width="100"
+         height="100"
+         x="60"
+         y="165"
+         rx="10.810811"
+         ry="10.810811" />
+      <rect
+         style="fill:#ffffff;stroke-width:0.843629"
+         id="rect4"
+         width="100"
+         height="100"
+         x="180"
+         y="165"
+         rx="10.810811"
+         ry="10.810811" />
+    </g>
+  </g>
+</svg>

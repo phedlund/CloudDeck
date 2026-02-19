@@ -1,0 +1,89 @@
+{
+  "color-space-for-untagged-svg-colors" : "display-p3",
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:0.20286,0.29266,0.43320,1.00000",
+      "display-p3:0.06513,0.15170,0.28121,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "hidden" : false,
+          "image-name" : "clouddeck_Orange.svg",
+          "name" : "clouddeck_Orange",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              217.9,
+              18.7
+            ]
+          }
+        },
+        {
+          "hidden" : false,
+          "image-name" : "clouddeck_Red.svg",
+          "name" : "clouddeck_Red",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              111.4,
+              -33.2
+            ]
+          }
+        },
+        {
+          "hidden" : false,
+          "image-name" : "clouddeck_Blue.svg",
+          "name" : "clouddeck_Blue",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -1.9,
+              -63
+            ]
+          }
+        },
+        {
+          "hidden" : false,
+          "image-name" : "clouddeck_Green.svg",
+          "name" : "clouddeck_Green",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -109.2,
+              -30.4
+            ]
+          }
+        },
+        {
+          "hidden" : false,
+          "image-name" : "clouddeck_Yellow.svg",
+          "name" : "clouddeck_Yellow",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -218.8,
+              19.1
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
