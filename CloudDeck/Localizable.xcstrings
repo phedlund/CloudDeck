@@ -13,6 +13,9 @@
     "Actions" : {
 
     },
+    "Add Card" : {
+
+    },
     "Add Label" : {
 
     },
@@ -100,7 +103,6 @@
 
     },
     "Edit List" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

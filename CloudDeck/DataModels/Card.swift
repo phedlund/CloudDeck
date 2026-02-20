@@ -7,6 +7,12 @@
 
 import Foundation
 import SwiftData
+import CoreTransferable
+import UniformTypeIdentifiers
+
+extension UTType {
+    static let cloudDeckCard = UTType(exportedAs: "dev.pbh.clouddeckcard")
+}
 
 struct CardDTO: Codable, Identifiable {
     let id: Int
@@ -133,4 +139,12 @@ extension Card {
         )
     }
 
+}
+
+struct CardDragItem: Codable, Transferable, Sendable {
+    let cardID: Int
+
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: .cloudDeckCard)
+    }
 }
