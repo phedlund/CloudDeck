@@ -20,6 +20,7 @@ struct StackColumnView: View {
     @State private var cardToMove: Card? = nil
     @State private var draggedCard: Card?
     @State private var targetIndex: Int? = nil
+    @State private var activeSheet: SheetItem?
 
     @Query private var cards: [Card]
 
@@ -88,12 +89,17 @@ struct StackColumnView: View {
 
                         CardRow(card: card)
                             .padding(.vertical, 6)
-//                            .padding(.horizontal)
                             .opacity(draggedCard?.id == card.id ? 0.4 : 1)
                             .draggable(CardDragItem(cardID: card.id)) {
                                 CardRow(card: card)
                                     .frame(width: 300)
                                     .onAppear { draggedCard = card }
+                            }
+                            .onTapGesture {
+                                activeSheet = SheetItem(id: card.id)
+                            }
+                            .contextMenu {
+                                CardContextMenu(cardToMove: $cardToMove, card: card)
                             }
                             .background(
                                 GeometryReader { geo in
@@ -101,8 +107,8 @@ struct StackColumnView: View {
                                         .dropDestination(for: CardDragItem.self) { items, location in
                                             guard let item = items.first else { return false }
                                             let insertAt = location.y < geo.size.height / 2
-                                                ? index        // top half → insert above
-                                                : index + 1    // bottom half → insert below
+                                            ? index        // top half → insert above
+                                            : index + 1    // bottom half → insert below
                                             commitReorder(to: insertAt, cardID: item.cardID)
                                             return true
                                         } isTargeted: { isTargeted in
@@ -112,7 +118,6 @@ struct StackColumnView: View {
                                                 }
                                                 return
                                             }
-                                            // Use index not index+1, so top half shows line above
                                             targetIndex = index
                                         }
                                 }
@@ -141,6 +146,9 @@ struct StackColumnView: View {
         .sheet(item: $cardToMove) {
             MoveCardSheet(card: $0)
         }
+        .sheet(item: $activeSheet) {
+            CardDetailSheet(cardID: $0.id)
+        }
     }
 
     private func commitReorder(to destinationIndex: Int, cardID: Int) {
@@ -156,7 +164,6 @@ struct StackColumnView: View {
 
         let toIndex = min(destinationIndex, reordered.count)
 
-        // No +1 adjustment — move(fromOffsets:toOffset:) handles it correctly as-is
         reordered.move(fromOffsets: IndexSet(integer: fromIndex), toOffset: toIndex)
 
         for reverseIndex in stride(from: reordered.count - 1, through: 0, by: -1) {
@@ -168,7 +175,8 @@ struct StackColumnView: View {
                 try? await deckAPI.updateCard(card)
             }
         }
-    }}
+    }
+}
 
 struct InsertionLine: View {
     let visible: Bool

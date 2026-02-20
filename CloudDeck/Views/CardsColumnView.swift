@@ -20,6 +20,8 @@ struct CardsColumnView: View {
     @State private var activeSheet: SheetItem?
     @State private var showNewCardSheet = false
     @State private var cardToMove: Card? = nil
+    @State private var draggedCard: Card?
+    @State private var targetIndex: Int? = nil
 
     @Query private var cards: [Card]
     @Query private var stacks: [Stack]
@@ -50,21 +52,58 @@ struct CardsColumnView: View {
                 }
             } else {
                 ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(cards, id: \.self) { card in
+                    LazyVStack(spacing: 0) {
+                        ForEach(Array(cards.enumerated()), id: \.element.id) { index, card in
+
+                            InsertionLine(visible: targetIndex == index)
+
                             CardRow(card: card)
-                                .contentShape(Rectangle())
+                                .padding(.vertical, 6)
+                                .opacity(draggedCard?.id == card.id ? 0.4 : 1)
+                                .draggable(CardDragItem(cardID: card.id)) {
+                                    CardRow(card: card)
+                                        .frame(width: 300)
+                                        .onAppear { draggedCard = card }
+                                }
                                 .onTapGesture {
                                     activeSheet = SheetItem(id: card.id)
                                 }
                                 .contextMenu {
                                     CardContextMenu(cardToMove: $cardToMove, card: card)
                                 }
+                                .background(
+                                    GeometryReader { geo in
+                                        Color.white.opacity(0.001)
+                                            .dropDestination(for: CardDragItem.self) { items, location in
+                                                guard let item = items.first else { return false }
+                                                let insertAt = location.y < geo.size.height / 2
+                                                ? index        // top half → insert above
+                                                : index + 1    // bottom half → insert below
+                                                commitReorder(to: insertAt, cardID: item.cardID)
+                                                return true
+                                            } isTargeted: { isTargeted in
+                                                guard isTargeted else {
+                                                    if targetIndex == index || targetIndex == index + 1 {
+                                                        targetIndex = nil
+                                                    }
+                                                    return
+                                                }
+                                                targetIndex = index
+                                            }
+                                    }
+                                )
                         }
-                        .onMove(perform: move)
+
+                        InsertionLine(visible: targetIndex == cards.count)
+
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
+                }
+                .dropDestination(for: CardDragItem.self) { _, _ in
+                    targetIndex = nil
+                    draggedCard = nil
+                    return false
                 }
             }
         }
@@ -92,15 +131,28 @@ struct CardsColumnView: View {
         }
     }
 
-    func move(from source: IndexSet, to destination: Int) {
-        var revisedCards = cards
-        revisedCards.move(fromOffsets: source, toOffset: destination)
-        for reverseIndex in stride(from: revisedCards.count - 1, through: 0, by: -1) {
-            revisedCards[reverseIndex].order = reverseIndex
+    private func commitReorder(to destinationIndex: Int, cardID: Int) {
+        defer {
+            targetIndex = nil
+            draggedCard = nil
         }
-        for card in revisedCards {
-            Task {
-                try? await self.deckAPI.updateCard(card)
+
+        var reordered = cards
+
+        guard let fromIndex = reordered.firstIndex(where: { $0.id == cardID })
+        else { return }
+
+        let toIndex = min(destinationIndex, reordered.count)
+
+        reordered.move(fromOffsets: IndexSet(integer: fromIndex), toOffset: toIndex)
+
+        for reverseIndex in stride(from: reordered.count - 1, through: 0, by: -1) {
+            reordered[reverseIndex].order = reverseIndex
+        }
+
+        Task {
+            for card in reordered {
+                try? await deckAPI.updateCard(card)
             }
         }
     }
