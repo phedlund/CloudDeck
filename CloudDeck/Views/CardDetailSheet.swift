@@ -9,9 +9,9 @@ import SwiftData
 import SwiftUI
 
 struct CardDetailSheet: View {
-    let cardID: Int
-
     @Environment(\.modelContext) private var modelContext
+
+    let cardID: Int
 
     @Query private var cards: [Card]
 

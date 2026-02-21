@@ -80,6 +80,7 @@ struct MoveCardSheet: View {
 }
 
 struct StacksPicker: View {
+    @Environment(\.modelContext) private var modelContext
     var boardID: Int
     @Binding var selectedStackID: Int?
 

@@ -60,6 +60,7 @@ struct ContentView: View {
                         boardID: selectedBoardID,
                         selectedCard: $selectedCard
                     )
+                    .environment(deckAPI)
                 }
                 .navigationSplitViewStyle(.balanced)
             }

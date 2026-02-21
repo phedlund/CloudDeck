@@ -64,6 +64,11 @@ struct CardsColumnView: View {
                                     CardRow(card: card)
                                         .frame(width: 300)
                                         .onAppear { draggedCard = card }
+                                        .onDisappear {
+                                            // Drag ended — reset regardless of how it ended
+                                            draggedCard = nil
+                                            targetIndex = nil
+                                        }
                                 }
                                 .onTapGesture {
                                     activeSheet = SheetItem(id: card.id)
@@ -94,7 +99,16 @@ struct CardsColumnView: View {
                                 )
                         }
 
-                        InsertionLine(visible: targetIndex == cards.count)
+                        Color.white.opacity(0.001)
+                            .frame(height: 44)  // generous hit area
+                            .overlay(InsertionLine(visible: targetIndex == cards.count))
+                            .dropDestination(for: CardDragItem.self) { items, _ in
+                                guard let item = items.first else { return false }
+                                commitReorder(to: cards.count, cardID: item.cardID)
+                                return true
+                            } isTargeted: { isTargeted in
+                                targetIndex = isTargeted ? cards.count : (targetIndex == cards.count ? nil : targetIndex)
+                            }
 
                     }
                     .padding(.horizontal, 16)

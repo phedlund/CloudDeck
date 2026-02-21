@@ -12,6 +12,7 @@ import UniformTypeIdentifiers
 
 extension UTType {
     static let cloudDeckCard = UTType(exportedAs: "dev.pbh.clouddeckcard")
+    static let cloudDeckStack = UTType(exportedAs: "dev.pbh.clouddeckstack")
 }
 
 struct CardDTO: Codable, Identifiable {
@@ -146,5 +147,12 @@ struct CardDragItem: Codable, Transferable, Sendable {
 
     static var transferRepresentation: some TransferRepresentation {
         CodableRepresentation(contentType: .cloudDeckCard)
+    }
+}
+
+struct StackDragItem: Codable, Transferable, Sendable {
+    let stackID: Int
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: .cloudDeckStack)
     }
 }

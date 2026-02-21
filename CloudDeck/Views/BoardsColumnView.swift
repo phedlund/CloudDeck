@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct BoardsColumnView: View {
+    @Environment(\.modelContext) private var modelContext
     @Environment(DeckAPI.self) private var deckAPI
 
     @Binding var selectedBoardID: Int?

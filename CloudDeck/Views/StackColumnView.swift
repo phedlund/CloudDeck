@@ -9,6 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct StackColumnView: View {
+    @Environment(\.modelContext) private var modelContext
     @Environment(DeckAPI.self) private var deckAPI
 
     let stack: Stack
@@ -95,6 +96,11 @@ struct StackColumnView: View {
                                 CardRow(card: card)
                                     .frame(width: 300)
                                     .onAppear { draggedCard = card }
+                                    .onDisappear {
+                                        // Drag ended — reset regardless of how it ended
+                                        draggedCard = nil
+                                        targetIndex = nil
+                                    }
                             }
                             .onTapGesture {
                                 activeSheet = SheetItem(id: card.id)
@@ -125,7 +131,16 @@ struct StackColumnView: View {
                             )
                     }
 
-                    InsertionLine(visible: targetIndex == cards.count)
+                    Color.white.opacity(0.001)
+                        .frame(height: 44)  // generous hit area
+                        .overlay(InsertionLine(visible: targetIndex == cards.count))
+                        .dropDestination(for: CardDragItem.self) { items, _ in
+                            guard let item = items.first else { return false }
+                            commitReorder(to: cards.count, cardID: item.cardID)
+                            return true
+                        } isTargeted: { isTargeted in
+                            targetIndex = isTargeted ? cards.count : (targetIndex == cards.count ? nil : targetIndex)
+                        }
                 }
                 .padding(.horizontal)
             }
@@ -195,6 +210,18 @@ struct InsertionLine: View {
             .fill(visible ? Color.accentColor : Color.clear)
             .frame(maxWidth: .infinity)
             .frame(height: 2)
+            .animation(.easeInOut(duration: 0.15), value: visible)
+    }
+}
+
+struct VerticalInsertionLine: View {
+    let visible: Bool
+
+    var body: some View {
+        Rectangle()
+            .fill(visible ? Color.accentColor : Color.clear)
+            .frame(width: 2)
+            .frame(maxHeight: .infinity)
             .animation(.easeInOut(duration: 0.15), value: visible)
     }
 }

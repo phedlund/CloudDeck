@@ -25,6 +25,14 @@
                 <string>public.data</string>
             </array>
         </dict>
+        <dict>
+            <key>UTTypeIdentifier</key>
+            <string>dev.pbh.clouddeckstack</string>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.data</string>
+            </array>
+        </dict>
     </array>
 </dict>
 </plist>

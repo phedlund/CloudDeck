@@ -10,6 +10,7 @@ import SwiftUI
 
 struct CardDetailView: View {
     @Bindable var card: Card
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(DeckAPI.self) private var deckAPI
 
