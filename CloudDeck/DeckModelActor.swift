@@ -46,107 +46,106 @@ extension DeckModelActor {
         try modelContext.save()
     }
 
-    func deleteBoard(boardId: Int) {
-        if let board = fetchBoard(id: boardId) {
-            modelContext.delete(board)
-            try? modelContext.save()
-        }
-    }
+//    func deleteBoard(boardId: Int) {
+//        if let board = fetchBoard(id: boardId) {
+//            modelContext.delete(board)
+//            try? modelContext.save()
+//        }
+//    }
 
-    func apply(stackDTOs: [StackDTO], boardID: Int) throws {
-
-        var serverStackIDs = Set<Int>()
-
-        for stackDTO in stackDTOs {
-            serverStackIDs.insert(stackDTO.id)
-            modelContext.insert(Stack(dto: stackDTO))
-
-            try reconcileCards(stackID: stackDTO.id, cardDTOs: stackDTO.cards ?? [])
-        }
-
-        try deleteMissingStacks(boardID: boardID, keep: serverStackIDs)
-        try modelContext.save()
-    }
+//    func apply(stackDTOs: [StackDTO], boardID: Int) throws {
+//
+//        var serverStackIDs = Set<Int>()
+//
+//        for stackDTO in stackDTOs {
+//            serverStackIDs.insert(stackDTO.id)
+//            modelContext.insert(Stack(dto: stackDTO))
+//
+//            try reconcileCards(stackID: stackDTO.id, cardDTOs: stackDTO.cards ?? [])
+//        }
+//
+//        try deleteMissingStacks(boardID: boardID, keep: serverStackIDs)
+//        try modelContext.save()
+//    }
 
     func addStack(_ dto: StackDTO) throws {
-        modelContext.insert(Stack(dto: dto))
+        guard let board = fetchBoard(id: dto.boardId) else {
+            return
+//            throw DeckSyncError.missingBoard(dto.boardId)
+        }
+        let stack = Stack(dto: dto)
+        stack.board = board
+        modelContext.insert(stack)
         try modelContext.save()
     }
 
-    func deleteStack(stackId: Int) {
-        if let stack = fetchStack(id: stackId) {
-            modelContext.delete(stack)
-            try? modelContext.save()
-        }
-    }
+//    func deleteStack(stackId: Int) {
+//        if let stack = fetchStack(id: stackId) {
+//            modelContext.delete(stack)
+//            try? modelContext.save()
+//        }
+//    }
+//
+//    func deleteCard(cardId: Int) {
+//        if let card = fetchCard(id: cardId) {
+//            modelContext.delete(card)
+//            try? modelContext.save()
+//        }
+//    }
 
-    func deleteCard(cardId: Int) {
-        if let card = fetchCard(id: cardId) {
-            modelContext.delete(card)
-            try? modelContext.save()
-        }
-    }
+//    private func reconcileCards(stackID: Int, cardDTOs: [CardDTO]) throws {
+//
+//        var serverIDs = Set<Int>()
+//
+//        for dto in cardDTOs {
+//
+//            serverIDs.insert(dto.id)
+//            if dto.deletedAt != 0 {
+//                try deleteCardIfExists(dto.id)
+//                continue
+//            }
+//        }
+//
+//        let descriptor = FetchDescriptor<Card>(
+//            predicate: #Predicate { $0.stackId == stackID }
+//        )
+//
+//        let locals = try modelContext.fetch(descriptor)
+//
+//        for local in locals where !serverIDs.contains(local.id) {
+//            modelContext.delete(local)
+//        }
+//    }
 
-    private func reconcileCards(stackID: Int, cardDTOs: [CardDTO]) throws {
+//    private func deleteMissingStacks(boardID: Int, keep serverIDs: Set<Int>) throws {
+//
+//        let descriptor = FetchDescriptor<Stack>(
+//            predicate: #Predicate { $0.boardId == boardID }
+//        )
+//
+//        let locals = try modelContext.fetch(descriptor)
+//
+//        for stack in locals where !serverIDs.contains(stack.id) {
+//            modelContext.delete(stack)
+//        }
+//    }
 
-        var serverIDs = Set<Int>()
+//    private func deleteCardIfExists(_ id: Int) throws {
+//        let descriptor = FetchDescriptor<Card>(
+//            predicate: #Predicate { $0.id == id }
+//        )
+//
+//        if let existing = try modelContext.fetch(descriptor).first {
+//            modelContext.delete(existing)
+//        }
+//    }
 
-        for dto in cardDTOs {
-
-            serverIDs.insert(dto.id)
-            if dto.deletedAt != 0 {
-                try deleteCardIfExists(dto.id)
-                continue
-            }
-        }
-
-        let descriptor = FetchDescriptor<Card>(
-            predicate: #Predicate { $0.stackId == stackID }
-        )
-
-        let locals = try modelContext.fetch(descriptor)
-
-        for local in locals where !serverIDs.contains(local.id) {
-            modelContext.delete(local)
-        }
-    }
-
-    private func deleteMissingStacks(boardID: Int, keep serverIDs: Set<Int>) throws {
-
-        let descriptor = FetchDescriptor<Stack>(
-            predicate: #Predicate { $0.boardId == boardID }
-        )
-
-        let locals = try modelContext.fetch(descriptor)
-
-        for stack in locals where !serverIDs.contains(stack.id) {
-            modelContext.delete(stack)
-        }
-    }
-
-    private func deleteCardIfExists(_ id: Int) throws {
-        let descriptor = FetchDescriptor<Card>(
-            predicate: #Predicate { $0.id == id }
-        )
-
-        if let existing = try modelContext.fetch(descriptor).first {
-            modelContext.delete(existing)
-        }
-    }
-
-    func insertNewCard(from dto: CardDTO) throws {
-
-        // fetch stack first (must exist — we created card inside it)
+    func addCard(from dto: CardDTO) throws {
         guard let stack = fetchStack(id: dto.stackId) else {
             return
 //            throw DeckSyncError.missingStack(dto.stackId)
         }
-
-//        let labelModels = dto.labels.map { DeckLabel(dto: $0) }
-
         let card = Card(dto: dto)
-
-        // relationship — SwiftData manages inverse automatically
         card.stack = stack
         modelContext.insert(card)
         try modelContext.save()

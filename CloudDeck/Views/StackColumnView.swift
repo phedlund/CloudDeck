@@ -31,7 +31,7 @@ struct StackColumnView: View {
         self.onMove = onMove
         self._selectedCard = selectedCard
         let stackId = stack.id
-        _cards = Query(filter: #Predicate<Card> { $0.stackId == stackId && !$0.archived }, sort: \.order)
+        _cards = Query(filter: #Predicate<Card> { $0.stackId == stackId && !$0.archived && $0.deletedAt == nil }, sort: \.order)
     }
 
     var body: some View {

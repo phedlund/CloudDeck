@@ -19,7 +19,7 @@ struct MoveCardSheet: View {
     @State private var createACopy: Bool = false
     @State private var isSaving = false
 
-    @Query(sort: \Board.title) private var boards: [Board]
+    @Query(filter: #Predicate<Board> { !$0.archived && $0.deletedAt == 0 }, sort: \.title) private var boards: [Board]
 
     @State private var selectedBoardID: Int?
     @State private var selectedStackID: Int?

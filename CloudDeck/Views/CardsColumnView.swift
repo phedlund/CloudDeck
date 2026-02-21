@@ -30,7 +30,7 @@ struct CardsColumnView: View {
         self.stackID = stackID
 
         if let stackID {
-            _cards = Query(filter: #Predicate<Card> { $0.stackId == stackID && !$0.archived }, sort: \.order)
+            _cards = Query(filter: #Predicate<Card> { $0.stackId == stackID && !$0.archived && $0.deletedAt == nil }, sort: \.order)
             _stacks = Query(filter: #Predicate<Stack> { $0.id == stackID } )
         } else {
             _cards = Query(filter: #Predicate<Card> { _ in false })

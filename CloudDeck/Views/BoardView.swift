@@ -28,7 +28,7 @@ struct BoardView: View {
         self._selectedCard = selectedCard
 
         if let boardID {
-            _stacks = Query(filter: #Predicate<Stack> { $0.boardId == boardID }, sort: \.order)
+            _stacks = Query(filter: #Predicate<Stack> { $0.boardId == boardID && $0.deletedAt == 0 }, sort: \.order)
             _boards = Query(filter: #Predicate<Board> { $0.id == boardID } )
         } else {
             _stacks = Query(filter: #Predicate<Stack> { _ in false })

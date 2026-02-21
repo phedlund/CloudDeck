@@ -22,7 +22,7 @@ struct CardDetailView: View {
 
     @State private var showUsers = false
 
-    @Query(filter: #Predicate<Board> { !$0.archived }, sort: \.title) private var boards: [Board]
+    @Query(filter: #Predicate<Board> { !$0.archived && $0.deletedAt == 0 }, sort: \.title) private var boards: [Board]
 
     var boardLabels: [DeckLabel] {
         if let board = boards.first( where: { $0.id == card.stack?.boardId } ) {

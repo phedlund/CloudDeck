@@ -59,7 +59,7 @@ final class DeckAPI {
 //        let currentStatus = try await newsStatus()
 //        if hasItems && lastModified > 0 {
         let boardIDs = try await syncBoards()
-        try await getBoardDetails(boardIDs: boardIDs)
+        try await syncBoardDetails(boardIDs: boardIDs)
         try await syncStacks(boardIDs: boardIDs)
 //        } else {
 //            try await initialSync()
@@ -104,7 +104,7 @@ final class DeckAPI {
         return result
     }
 
-    private func getBoardDetails(boardIDs: [Int]) async throws {
+    private func syncBoardDetails(boardIDs: [Int]) async throws {
         for boardId in boardIDs {
             let (data, response) = try await URLSession.shared.data(for: Router.board(id: boardId).urlRequest())
             if let response = response as? HTTPURLResponse {
@@ -147,7 +147,9 @@ final class DeckAPI {
                     let decoder = JSONDecoder()
                     decoder.dateDecodingStrategy = .secondsSince1970
                     if let deckStackDTOs = try? decoder.decode([StackDTO].self, from: data) {
-                        try await backgroundActor.apply(stackDTOs: deckStackDTOs, boardID: boardId)
+                        for stackDTO in deckStackDTOs {
+                            try await backgroundActor.addStack(stackDTO)
+                        }
                         try? await backgroundActor.save()
                     }
                 case 304:
@@ -176,7 +178,7 @@ final class DeckAPI {
         }
         let boardDTO = try JSONDecoder().decode(BoardSummaryDTO.self, from: data)
         await backgroundActor.insert(boardDTO)
-        try await getBoardDetails(boardIDs: [boardDTO.id])
+        try await syncBoardDetails(boardIDs: [boardDTO.id])
     }
 
     func updateBoard(boardId: Int, title: String, color: String, archived: Bool) async throws {
@@ -216,7 +218,7 @@ final class DeckAPI {
             throw DeckError.serverError
         }
 
-        await backgroundActor.deleteBoard(boardId: boardId)
+//        await backgroundActor.deleteBoard(boardId: boardId)
     }
 
     func createStack(boardId: Int, title: String, order: Int) async throws {
@@ -280,7 +282,7 @@ final class DeckAPI {
             throw DeckError.serverError
         }
 
-        await backgroundActor.deleteStack(stackId: stackId)
+//        await backgroundActor.deleteStack(stackId: stackId)
     }
 
     func createCard(boardId: Int, stackId: Int, title: String, description: String? = nil) async throws -> CardDTO {
@@ -301,7 +303,7 @@ final class DeckAPI {
             throw DeckError.serverError
         }
         let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
-        try await backgroundActor.insertNewCard(from: cardDTO)
+        try await backgroundActor.addCard(from: cardDTO)
         return cardDTO
     }
 
@@ -343,7 +345,7 @@ final class DeckAPI {
         }
 
         let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
-        try await backgroundActor.insertNewCard(from: cardDTO)
+        try await backgroundActor.addCard(from: cardDTO)
     }
 
     func moveCard(_ card: Card, newBoardId: Int, newStackId: Int) async throws {
@@ -384,7 +386,7 @@ final class DeckAPI {
         }
 
         let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
-        try await backgroundActor.insertNewCard(from: cardDTO)
+        try await backgroundActor.addCard(from: cardDTO)
     }
 
     func copyCard(_ card: Card, newBoardId: Int, newStackId: Int) async throws {
@@ -426,7 +428,7 @@ final class DeckAPI {
         }
 
         let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
-        try await backgroundActor.insertNewCard(from: cardDTO)
+        try await backgroundActor.addCard(from: cardDTO)
     }
 
     func setCardDone(card: Card, done: Bool) async throws {
@@ -467,7 +469,7 @@ final class DeckAPI {
         }
 
         let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
-        try await backgroundActor.insertNewCard(from: cardDTO)
+        try await backgroundActor.addCard(from: cardDTO)
     }
 
     func setCardDueDate(card: Card, dueDate: Date?) async throws {
@@ -508,7 +510,7 @@ final class DeckAPI {
         }
 
         let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
-        try await backgroundActor.insertNewCard(from: cardDTO)
+        try await backgroundActor.addCard(from: cardDTO)
     }
 
     func setCardArchived(card: Card, archived: Bool) async throws {
@@ -549,7 +551,7 @@ final class DeckAPI {
         }
 
         let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
-        try await backgroundActor.insertNewCard(from: cardDTO)
+        try await backgroundActor.addCard(from: cardDTO)
     }
 
     // New API
@@ -568,7 +570,7 @@ final class DeckAPI {
         }
 
         let cardDTO = try JSONDecoder().decode(CardDTO.self, from: data)
-        try await backgroundActor.insertNewCard(from: cardDTO)
+        try await backgroundActor.addCard(from: cardDTO)
     }
 
     func deleteCard(boardId: Int, stackId: Int, cardId: Int) async throws {
@@ -583,7 +585,7 @@ final class DeckAPI {
             throw DeckError.serverError
         }
 
-        await backgroundActor.deleteCard(cardId: cardId)
+//        await backgroundActor.deleteCard(cardId: cardId)
     }
 
     func assignCardLabel(card: Card, label: DeckLabel) async throws {
