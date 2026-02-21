@@ -12,7 +12,8 @@ struct StackColumnView: View {
     @Environment(DeckAPI.self) private var deckAPI
 
     let stack: Stack
-    let onMove: (Int, Stack, Int?) -> Void
+    let onMove: (Int, Stack, Int) -> Void
+
     @Binding var selectedCard: Card?
 
     @State private var showNewCardSheet = false
@@ -24,7 +25,7 @@ struct StackColumnView: View {
 
     @Query private var cards: [Card]
 
-    init(stack: Stack, onMove: @escaping (Int, Stack, Int?) -> Void, selectedCard: Binding<Card?>) {
+    init(stack: Stack, onMove: @escaping (Int, Stack, Int) -> Void, selectedCard: Binding<Card?>) {
         self.stack = stack
         self.onMove = onMove
         self._selectedCard = selectedCard
@@ -157,12 +158,19 @@ struct StackColumnView: View {
             draggedCard = nil
         }
 
+        let toIndex = min(destinationIndex, cards.count)
+
+        // Cross-stack move
+        if !cards.contains(where: { $0.id == cardID }) {
+            onMove(cardID, stack, toIndex)
+            return
+        }
+
+        // Same-stack reorder
         var reordered = cards
 
         guard let fromIndex = reordered.firstIndex(where: { $0.id == cardID })
         else { return }
-
-        let toIndex = min(destinationIndex, reordered.count)
 
         reordered.move(fromOffsets: IndexSet(integer: fromIndex), toOffset: toIndex)
 
@@ -176,6 +184,7 @@ struct StackColumnView: View {
             }
         }
     }
+
 }
 
 struct InsertionLine: View {

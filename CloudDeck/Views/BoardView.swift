@@ -9,6 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct BoardView: View {
+    @Environment(DeckAPI.self) private var deckAPI
+
     let boardID: Int?
     @Binding var selectedCard: Card?
 
@@ -38,7 +40,7 @@ struct BoardView: View {
         ScrollView(.horizontal) {
             LazyHStack(alignment: .top, spacing: 16) {
                 ForEach(stacks) { stack in
-                    StackColumnView(stack: stack, onMove: move, selectedCard: $selectedCard)
+                    StackColumnView(stack: stack, onMove: handleMove, selectedCard: $selectedCard)
                         .frame(width: 320)
                 }
             }
@@ -61,55 +63,45 @@ struct BoardView: View {
         }
     }
 
-    private func move(cardID: Int, to targetStack: Stack, before targetCardID: Int?) {
-
-//        var revisedCards = cards
-//        revisedCards.move(fromOffsets: source, toOffset: destination)
-//        for reverseIndex in stride(from: revisedCards.count - 1, through: 0, by: -1) {
-//            revisedCards[reverseIndex].order = reverseIndex
-//        }
-//        for card in revisedCards {
-//            Task {
-//                try? await self.deckAPI.updateCard(card)
-//            }
-//        }
-//
-//
-//
-//
-        guard let card = findCard(by: cardID),
-              let sourceStack = stacks.first(where: { $0.id == card.stackId })
+    private func handleMove(cardID: Int, toStack: Stack, toIndex: Int) {
+        // Find the card across all stacks
+        guard let card = stacks.flatMap(\.cards).first(where: { $0.id == cardID })
         else { return }
-
-        // Remove from source
-        sourceStack.cards.removeAll { $0.id == cardID }
-
-        // Update stack if needed
-        card.stackId = targetStack.id
-
-        if let targetCardID,
-           let index = targetStack.cards.firstIndex(where: { $0.id == targetCardID }) {
-            targetStack.cards.insert(card, at: index)
-        } else {
-            targetStack.cards.append(card)
+        
+        let sourceStack = stacks.first(where: { $0.id == card.stackId })
+        
+        // Update the card's stack
+        card.stackId = toStack.id
+        card.order = toIndex
+        
+        // Re-sequence the source stack
+        if let sourceStack {
+            let sourceCards = sourceStack.cards
+                .filter { $0.id != cardID }
+                .sorted { $0.order < $1.order }
+            for reverseIndex in stride(from: sourceCards.count - 1, through: 0, by: -1) {
+                sourceCards[reverseIndex].order = reverseIndex
+            }
+            Task {
+                for card in sourceCards {
+                    try? await deckAPI.updateCard(card)
+                }
+            }
         }
-
-        normalizeOrder(in: sourceStack)
-
-        if sourceStack.id != targetStack.id {
-            normalizeOrder(in: targetStack)
+        
+        // Re-sequence the destination stack (insert at toIndex)
+        var destCards = toStack.cards
+            .filter { $0.id != cardID }
+            .sorted { $0.order < $1.order }
+        destCards.insert(card, at: min(toIndex, destCards.count))
+        for reverseIndex in stride(from: destCards.count - 1, through: 0, by: -1) {
+            destCards[reverseIndex].order = reverseIndex
         }
-    }
-
-    private func normalizeOrder(in stack: Stack) {
-        for (index, card) in stack.cards.enumerated() {
-            card.order = Int(index)
+        
+        Task {
+            for card in destCards {
+                try? await deckAPI.updateCard(card)
+            }
         }
-    }
-
-    private func findCard(by id: Int) -> Card? {
-        stacks
-            .flatMap { $0.cards }
-            .first { $0.id == id }
     }
 }
