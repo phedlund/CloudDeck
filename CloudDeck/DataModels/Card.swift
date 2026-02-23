@@ -31,19 +31,8 @@ struct CardDTO: Codable, Identifiable {
     @EpochDateOrNil var createdAt: Date?
     @EpochDateOrNil var deletedAt: Date?
 
-    let done: String?
-    let duedate: String?
-}
-
-extension CardDTO {
-
-    func parsedDone(using iso: ISO8601DateFormatter) -> Date? {
-        done.flatMap { iso.date(from: $0) }
-    }
-
-    func parsedDue(using iso: ISO8601DateFormatter) -> Date? {
-        duedate.flatMap { iso.date(from: $0) }
-    }
+    @ISO8601DateOrNil var done: Date?
+    @ISO8601DateOrNil var duedate: Date?
 }
 
 @Model
@@ -108,7 +97,6 @@ final class Card {
 
 extension Card {
     convenience init(dto: CardDTO) {
-        let iso = ISO8601DateFormatter()
 
         let labelModels = dto.labels.map { DeckLabel(dto: $0) }
         let assignedUsers = dto.assignedUsers.map { AssignedUser(dto: $0) }
@@ -124,8 +112,8 @@ extension Card {
             labels: labelModels,
             createdAt: dto.createdAt,
             lastModified: dto.lastModified,
-            doneAt: dto.done.flatMap { iso.date(from: $0) },
-            dueDate: dto.duedate.flatMap { iso.date(from: $0) },
+            doneAt: dto.done,
+            dueDate: dto.duedate,
             deletedAt: dto.deletedAt,
             owner: .init(dto: dto.owner),
             assignedUsers: assignedUsers
