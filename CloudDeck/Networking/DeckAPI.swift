@@ -37,15 +37,6 @@ final class DeckAPI {
         return f
     }()
 
-    private let deckDateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.calendar = Calendar(identifier: .iso8601)
-        f.locale = Locale(identifier: "en_US_POSIX")
-        f.timeZone = TimeZone(secondsFromGMT: 0)
-        f.dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXXXX"
-        return f
-    }()
-
     init(modelContainer: ModelContainer) {
         self.backgroundActor = DeckModelActor(modelContainer: modelContainer)
         let backgroundSessionConfig = URLSessionConfiguration.background(withIdentifier: "dev.pbh.clouddeck.background")
