@@ -27,7 +27,7 @@ struct StacksColumnView: View {
         self._selectedStackID = selectedStackID
 
         if let boardID {
-            _stacks = Query(filter: #Predicate<Stack> { $0.boardId == boardID && $0.deletedAt == 0 }, sort: \.order)
+            _stacks = Query(filter: #Predicate<Stack> { $0.boardId == boardID && $0.deletedAt == nil }, sort: \.order)
             _boards = Query(filter: #Predicate<Board> { $0.id == boardID } )
 
         } else {

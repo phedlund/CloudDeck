@@ -27,23 +27,15 @@ struct CardDTO: Codable, Identifiable {
     let owner: UserDTO
     let assignedUsers: [AssignedUserDTO]
 
-    let lastModified: Int
-    let createdAt: Int
-    let deletedAt: Int
+    @EpochDateOrNil var lastModified: Date?
+    @EpochDateOrNil var createdAt: Date?
+    @EpochDateOrNil var deletedAt: Date?
 
     let done: String?
     let duedate: String?
 }
 
 extension CardDTO {
-
-    var createdDate: Date {
-        Date(timeIntervalSince1970: TimeInterval(createdAt))
-    }
-
-    var modifiedDate: Date {
-        Date(timeIntervalSince1970: TimeInterval(lastModified))
-    }
 
     func parsedDone(using iso: ISO8601DateFormatter) -> Date? {
         done.flatMap { iso.date(from: $0) }
@@ -63,8 +55,8 @@ final class Card {
     var type: String
     var order: Int
     var archived: Bool
-    var createdAt: Date
-    var lastModified: Date
+    var createdAt: Date?
+    var lastModified: Date?
     var dueDate: Date?
     var doneAt: Date?
     var deletedAt: Date?
@@ -88,8 +80,8 @@ final class Card {
         order: Int,
         archived: Bool,
         labels: [DeckLabel] = [],
-        createdAt: Date,
-        lastModified: Date,
+        createdAt: Date?,
+        lastModified: Date?,
         doneAt: Date? = nil,
         dueDate: Date? = nil,
         deletedAt: Date? = nil,
@@ -130,11 +122,11 @@ extension Card {
             order: dto.order,
             archived: dto.archived,
             labels: labelModels,
-            createdAt: Date(timeIntervalSince1970: TimeInterval(dto.createdAt)),
-            lastModified: Date(timeIntervalSince1970: TimeInterval(dto.lastModified)),
+            createdAt: dto.createdAt,
+            lastModified: dto.lastModified,
             doneAt: dto.done.flatMap { iso.date(from: $0) },
             dueDate: dto.duedate.flatMap { iso.date(from: $0) },
-            deletedAt: dto.deletedAt == 0 ? nil : Date(timeIntervalSince1970: TimeInterval(dto.deletedAt)),
+            deletedAt: dto.deletedAt,
             owner: .init(dto: dto.owner),
             assignedUsers: assignedUsers
         )

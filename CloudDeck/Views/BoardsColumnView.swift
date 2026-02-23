@@ -18,7 +18,7 @@ struct BoardsColumnView: View {
     @State private var showNewBoardSheet: Bool = false
     @State private var boardToShowDetails: Board? = nil
 
-    @Query(filter: #Predicate<Board> { !$0.archived && $0.deletedAt == 0 }, sort: \.title) private var boards: [Board]
+    @Query(filter: #Predicate<Board> { !$0.archived && $0.deletedAt == nil }, sort: \.title) private var boards: [Board]
 
     var body: some View {
         Group {

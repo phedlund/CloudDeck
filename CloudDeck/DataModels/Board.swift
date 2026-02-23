@@ -14,8 +14,8 @@ struct BoardSummaryDTO: Decodable {
     let title: String
     let color: String
     let archived: Bool
-    let deletedAt: Int
-    let lastModified: Int
+    @EpochDateOrNil var deletedAt: Date?
+    @EpochDateOrNil var lastModified: Date?
     let eTag: String
     let owner: UserDTO
     let users: [UserDTO]
@@ -39,8 +39,8 @@ struct BoardDetailDTO: Decodable {
     let title: String
     let color: String
     let archived: Bool
-    let deletedAt: Int
-    let lastModified: Int
+    @EpochDateOrNil var deletedAt: Date?
+    @EpochDateOrNil var lastModified: Date?
     let eTag: String
     let owner: UserDTO
     let users: [UserDTO]
@@ -99,8 +99,8 @@ final class Board {
     var title: String
     var color: String
     var archived: Bool
-    var deletedAt: Int
-    var lastModified: Date
+    var deletedAt: Date?
+    var lastModified: Date?
     var eTag: String
 
     // Relationships
@@ -132,8 +132,8 @@ final class Board {
          title: String,
          color: String,
          archived: Bool = false,
-         deletedAt: Int = 0,
-         lastModified: Date = Date(),
+         deletedAt: Date? = nil,
+         lastModified: Date? = nil,
          eTag: String = "",
          owner: User,
          users: [User] = []) {
@@ -160,7 +160,7 @@ extension Board {
             color: dto.color,
             archived: dto.archived,
             deletedAt: dto.deletedAt,
-            lastModified: Date(timeIntervalSince1970: TimeInterval(dto.lastModified)),
+            lastModified: dto.lastModified,
             eTag: dto.eTag,
             owner: .init(dto: dto.owner),
             users: userModels
@@ -177,7 +177,7 @@ extension Board {
             color: dto.color,
             archived: dto.archived,
             deletedAt: dto.deletedAt,
-            lastModified: Date(timeIntervalSince1970: TimeInterval(dto.lastModified)),
+            lastModified: dto.lastModified,
             eTag: dto.eTag,
             owner: .init(dto: dto.owner),
             users: userModels
@@ -192,7 +192,7 @@ extension Board {
         color = dto.color
         archived = dto.archived
         deletedAt = dto.deletedAt
-        lastModified = Date(timeIntervalSince1970: TimeInterval(dto.lastModified))
+        lastModified = dto.lastModified
         eTag = dto.eTag
     }
 
@@ -205,7 +205,7 @@ extension Board {
         color = dto.color
         archived = dto.archived
         deletedAt = dto.deletedAt
-        lastModified = Date(timeIntervalSince1970: TimeInterval(dto.lastModified))
+        lastModified = dto.lastModified
         eTag = dto.eTag
         stacks = stackModels
         labels = labelModels

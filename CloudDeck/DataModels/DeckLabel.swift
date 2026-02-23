@@ -14,7 +14,7 @@ struct LabelDTO: Codable {
     let color: String
     let boardId: Int
     let cardId: Int?
-    let lastModified: Int
+    @EpochDateOrNil var lastModified: Date?
     let ETag: String
 }
 
@@ -25,7 +25,7 @@ final class DeckLabel {
     var color: String
     var boardId: Int
     var cardId: Int?
-    var lastModified: Date
+    var lastModified: Date?
     var ETag: String
 
     @Relationship(inverse: \Board.labels) var board: Board?
@@ -36,7 +36,7 @@ final class DeckLabel {
          color: String,
          boardId: Int,
          cardId: Int? = nil,
-         lastModified: Date,
+         lastModified: Date?,
          ETag: String) {
         self.id = id
         self.title = title
@@ -56,7 +56,7 @@ extension DeckLabel {
                   title: dto.title,
                   color: dto.color,
                   boardId: dto.boardId,
-                  lastModified: Date(timeIntervalSince1970: TimeInterval(dto.lastModified)),
+                  lastModified: dto.lastModified,
                   ETag: dto.ETag)
     }
     

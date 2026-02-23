@@ -12,8 +12,8 @@ struct StackDTO: Codable, Identifiable {
     let id: Int
     let title: String
     let boardId: Int
-    let deletedAt: Int
-    let lastModified: Int
+    @EpochDateOrNil var deletedAt: Date?
+    @EpochDateOrNil var lastModified: Date?
     let order: Int
     let eTag: String
     let cards: [CardDTO]?
@@ -37,7 +37,7 @@ final class Stack {
     @Attribute(.unique) var id: Int
     var title: String
     var boardId: Int
-    var deletedAt: Int
+    var deletedAt: Date?
     var order: Int
     var lastModified: Date?
 
@@ -50,7 +50,7 @@ final class Stack {
         id: Int,
         title: String,
         boardId: Int,
-        deletedAt: Int,
+        deletedAt: Date?,
         order: Int,
         lastModified: Date?,
         eTag: String?,
@@ -78,7 +78,7 @@ extension Stack {
             boardId: dto.boardId,
             deletedAt: dto.deletedAt,
             order: dto.order,
-            lastModified: Date(timeIntervalSince1970: TimeInterval(dto.lastModified)),
+            lastModified: dto.lastModified,
             eTag: dto.eTag,
             cards: cardModels ?? []
         )
