@@ -8,24 +8,8 @@
 import Foundation
 import SwiftData
 
-struct SyncRequests {
-    let boardRequest: URLRequest
-    let stackRequest: URLRequest
-    let cardRequest: URLRequest
-}
-
 @Observable
 final class DeckAPI {
-    
-
-//    Sun, 03 Aug 2019 10:34:12 GMT
-
-    //EXAMPLE:  "Mon, 19 Oct 2015 05:57:12 GMT"
-//        let date = httpResp.allHeaderFields["Last-Modified"] as! String
-//        let dateFormatter = NSDateFormatter()
-//        dateFormatter.dateFormat = "EEEE, dd LLL yyyy HH:mm:ss zzz"
-//        serverDate = dateFormatter.dateFromString(date) as NSDate?
-
     private let backgroundActor: DeckModelActor
     private let backgroundSession: URLSession
     private let iso: ISO8601DateFormatter = {
@@ -208,8 +192,6 @@ final class DeckAPI {
         guard (response as? HTTPURLResponse)?.statusCode == 200 else {
             throw DeckError.serverError
         }
-
-//        await backgroundActor.deleteBoard(boardId: boardId)
     }
 
     func createStack(boardId: Int, title: String, order: Int) async throws {
@@ -272,8 +254,6 @@ final class DeckAPI {
         guard (response as? HTTPURLResponse)?.statusCode == 200 else {
             throw DeckError.serverError
         }
-
-//        await backgroundActor.deleteStack(stackId: stackId)
     }
 
     func createCard(boardId: Int, stackId: Int, title: String, description: String? = nil) async throws -> CardDTO {
@@ -575,8 +555,6 @@ final class DeckAPI {
         guard (response as? HTTPURLResponse)?.statusCode == 200 else {
             throw DeckError.serverError
         }
-
-//        await backgroundActor.deleteCard(cardId: cardId)
     }
 
     func assignCardLabel(card: Card, label: DeckLabel) async throws {
@@ -624,7 +602,6 @@ final class DeckAPI {
             case 200:
                 let filteredLabels = card.labels.filter( { $0.id != label.id } )
                 card.labels = filteredLabels
-//                try await updateCard(card)
             default:
                 throw DeckError.serverError
             }
