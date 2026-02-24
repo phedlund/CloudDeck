@@ -60,6 +60,10 @@ struct CardRow: View {
                                 .symbolRenderingMode(.palette)
                                 .foregroundStyle(.green, .secondary)
                             }
+                            .padding(3)
+                            .background(
+                                Capsule().fill(.green.opacity(0.15))
+                            )
                         }
 
 //                        if card.commentCount > 0 {
