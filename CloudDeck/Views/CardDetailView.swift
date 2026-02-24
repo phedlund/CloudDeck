@@ -81,6 +81,7 @@ struct CardDetailView: View {
                                     .imageScale(.large)
                             }
                             .buttonStyle(.borderless)
+                            .disabled(card.archived == true)
                             .popover(isPresented: $showLabels) {
                                 VStack(alignment: .leading, spacing: 8) {
                                     ForEach(boardLabels) { label in
@@ -131,6 +132,7 @@ struct CardDetailView: View {
                                     .imageScale(.large)
                             }
                             .buttonStyle(.borderless)
+                            .disabled(card.archived == true)
                             .popover(isPresented: $showUsers) {
                                 VStack(alignment: .leading, spacing: 8) {
                                     ForEach(boardUsers) { user in
@@ -157,7 +159,31 @@ struct CardDetailView: View {
                     } icon: {
                         Image(systemName: "person")
                     }
-                    TaskDatePicker(date: $card.dueDate)
+                    if let doneAt = card.doneAt {
+                        Label {
+                            HStack {
+                                Text(doneAt.formatted(date: .abbreviated, time: .shortened))
+                                Spacer()
+                                Button {
+                                    Task {
+                                        do {
+                                            try await deckAPI.setCardArchived(card: card, archived: true)
+                                        } catch {
+                                            //
+                                        }
+                                    }
+                                } label: {
+                                    Image(systemName: "archivebox")
+                                        .imageScale(.large)
+                                }
+                                .disabled(card.archived == true)
+                            }
+                        } icon: {
+                            Image(systemName: "calendar.badge.checkmark")
+                        }
+                    } else {
+                        TaskDatePicker(date: $card.dueDate)
+                    }
                     Label {
                         Toggle("", isOn: Binding(
                             get: {
@@ -173,6 +199,7 @@ struct CardDetailView: View {
                                 }
                             }
                         ))
+                        .disabled(card.archived == true)
                     } icon: {
                         Image(systemName: "checkmark")
                     }
