@@ -50,15 +50,34 @@ struct CardRow: View {
                     HStack(spacing: 14) {
 
                         if let dueDate = card.dueDate {
-                            Label("\(formattedRelativeTime(from: dueDate, relativeTo: Date()))", systemImage: "clock")
+                            if dueDate < Date() {
+                                Label {
+                                    Text("\(formattedRelativeTime(from: dueDate, relativeTo: Date()))")
+                                } icon: {
+                                    Image(systemName: "clock")
+                                        .symbolVariant(.fill)
+                                        .symbolRenderingMode(.palette)
+                                        .foregroundStyle(.red, .red)
+                                }
+                                .padding(3)
+                                .background(
+                                    Capsule().fill(.red.opacity(0.15))
+                                )
+                            } else {
+                                Label {
+                                    Text("\(formattedRelativeTime(from: dueDate, relativeTo: Date()))")
+                                } icon: {
+                                    Image(systemName: "clock")
+                                }
+                            }
                         } else if let doneAt = card.doneAt {
                             Label {
                                 Text("\(formattedRelativeTime(from: doneAt, relativeTo: Date()))")
                             } icon: {
                                 Image(systemName: "checkmark")
-                                .symbolVariant(.circle)
-                                .symbolRenderingMode(.palette)
-                                .foregroundStyle(.green, .secondary)
+                                    .symbolVariant(.circle.fill)
+                                    .symbolRenderingMode(.palette)
+                                    .foregroundStyle(.white, .green)
                             }
                             .padding(3)
                             .background(
