@@ -13,10 +13,9 @@ struct CardRow: View {
     private var hasBottomRow: Bool {
         return !card.assignedUsers.isEmpty ||
         card.dueDate != nil ||
-        card.doneAt != nil
-//        card.commentCount > 0 ||
-//        card.attachmentCount > 0 ||
-//        card.checklistTotalCount > 0 ||
+        card.doneAt != nil ||
+        card.commentsCount > 0 ||
+        card.attachmentCount > 0
     }
 
     var body: some View {
@@ -45,8 +44,6 @@ struct CardRow: View {
 
             if hasBottomRow {
                 HStack(spacing: 16) {
-
-                    // Left side metadata
                     HStack(spacing: 14) {
 
                         if let dueDate = card.dueDate {
@@ -84,21 +81,20 @@ struct CardRow: View {
                                 Capsule().fill(.green.opacity(0.15))
                             )
                         }
-
-//                        if card.commentCount > 0 {
-//                            Label("\(card.commentCount)", systemImage: "bubble.right")
-//                        }
-//
-//                        if card.attachmentCount > 0 {
-//                            Label("\(card.attachmentCount)", systemImage: "paperclip")
-//                        }
-//
-//                        if card.checklistCompletedCount > 0 {
-//                            Label(
-//                                "\(card.checklistCompletedCount)/\(card.checklistTotalCount)",
-//                                systemImage: "checkmark.square"
-//                            )
-//                        }
+                        if card.commentsCount > 0 {
+                            Label {
+                                Text("\(card.commentsCount)")
+                            } icon: {
+                                Image(systemName: "bubble.left")
+                            }
+                        }
+                        if card.attachmentCount > 0 {
+                            Label {
+                                Text("\(card.attachmentCount)")
+                            } icon: {
+                                Image(systemName: "paperclip")
+                            }
+                        }
                     }
 
                     Spacer()

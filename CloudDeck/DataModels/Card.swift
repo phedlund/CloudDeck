@@ -26,6 +26,9 @@ struct CardDTO: Codable, Identifiable {
     let labels: [LabelDTO]
     let owner: UserDTO
     let assignedUsers: [AssignedUserDTO]
+    let attachmentCount: Int
+    let commentsCount: Int
+    let overdue: Int
 
     @EpochDateOrNil var lastModified: Date?
     @EpochDateOrNil var createdAt: Date?
@@ -49,6 +52,10 @@ final class Card {
     var dueDate: Date?
     var doneAt: Date?
     var deletedAt: Date?
+    var attachmentCount: Int
+    var commentsCount: Int
+    var overdue: Int
+
 
     @Relationship(inverse: \Stack.cards) var stack: Stack?
 
@@ -75,7 +82,10 @@ final class Card {
         dueDate: Date? = nil,
         deletedAt: Date? = nil,
         owner: User,
-        assignedUsers: [AssignedUser] = []
+        assignedUsers: [AssignedUser] = [],
+        attachmentCount: Int,
+        commentsCount: Int,
+        overdue: Int
     ) {
         self.id = id
         self.title = title
@@ -92,6 +102,9 @@ final class Card {
         self.deletedAt = deletedAt
         self.owner = owner
         self.assignedUsers = assignedUsers
+        self.attachmentCount = attachmentCount
+        self.commentsCount = commentsCount
+        self.overdue = overdue
     }
 }
 
@@ -116,7 +129,10 @@ extension Card {
             dueDate: dto.duedate,
             deletedAt: dto.deletedAt,
             owner: .init(dto: dto.owner),
-            assignedUsers: assignedUsers
+            assignedUsers: assignedUsers,
+            attachmentCount: dto.attachmentCount,
+            commentsCount: dto.commentsCount,
+            overdue: dto.overdue
         )
     }
 
