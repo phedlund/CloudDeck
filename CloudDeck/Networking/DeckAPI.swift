@@ -28,6 +28,17 @@ final class DeckAPI {
         backgroundSession = URLSession(configuration: backgroundSessionConfig)
     }
 
+    func ncVersion() async throws -> NextcloudStatus? {
+        let versionRequest = try StatusRouter.status.urlRequest()
+        let (data, response) = try await URLSession.shared.data(for: versionRequest)
+        print(String(data: data, encoding: .utf8) ?? "")
+        let decoder = JSONDecoder()
+        if let cloudStatus = try? decoder.decode(NextcloudStatus.self, from: data) {
+            return cloudStatus
+        }
+        return nil
+    }
+
     func sync() async throws /*-> NewsStatusDTO? */ {
 //        syncState = .started
 //        let hasItems = await backgroundActor.hasItems()

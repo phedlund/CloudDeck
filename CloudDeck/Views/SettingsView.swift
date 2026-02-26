@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(AuthenticationManager.self) private var authManager
+    @Environment(DeckAPI.self) private var deckAPI
 
     var body: some View {
         NavigationStack {
@@ -35,6 +36,9 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
+        }
+        .task {
+            try? await deckAPI.ncVersion()
         }
     }
 }

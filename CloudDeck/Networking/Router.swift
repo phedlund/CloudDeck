@@ -8,6 +8,11 @@
 import Foundation
 import SwiftUI
 
+enum NetworkError: Error {
+    case generic(message: String)
+    case missingUrl
+}
+
 enum Method: String {
     case connect
     case delete
