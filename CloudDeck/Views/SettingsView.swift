@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
     @Environment(AuthenticationManager.self) private var authManager
     @Environment(DeckAPI.self) private var deckAPI
 
@@ -26,7 +27,7 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
-            List {
+            Form {
                 if let account = authManager.currentAccount() {
                     Section {
                         LabeledContent("Server", value: account.serverURL)
@@ -51,6 +52,13 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(role: .confirm) {
+                        dismiss()
+                    }
+                }
+            }
         }
         .task {
             try? await deckAPI.capabilities()
