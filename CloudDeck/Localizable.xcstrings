@@ -214,6 +214,16 @@
     },
     "Username" : {
 
+    },
+    "Using Deck %@ on Nextcloud %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Using Deck %1$@ on Nextcloud %2$@"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

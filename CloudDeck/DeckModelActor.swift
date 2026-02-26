@@ -18,7 +18,9 @@ public let schema = Schema([
     Permissions.self,
     ACLItem.self,
     ActiveSession.self,
-    BoardSettings.self
+    BoardSettings.self,
+    OCSVersion.self,
+    Deck.self
 ])
 
 @ModelActor
@@ -33,6 +35,20 @@ actor DeckModelActor: Sendable {
 }
 
 extension DeckModelActor {
+
+    func insert(_ dto: OCSVersionDTO) {
+        modelContext.insert(
+            OCSVersion(dto: dto)
+        )
+        try? modelContext.save()
+    }
+
+    func insert(_ dto: DeckDTO) {
+        modelContext.insert(
+            Deck(dto: dto)
+        )
+        try? modelContext.save()
+    }
 
     func insert(_ dto: BoardSummaryDTO) {
         modelContext.insert(

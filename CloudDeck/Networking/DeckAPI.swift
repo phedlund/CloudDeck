@@ -31,7 +31,15 @@ final class DeckAPI {
     func ncVersion() async throws -> NextcloudStatus? {
         let versionRequest = try StatusRouter.status.urlRequest()
         let (data, response) = try await URLSession.shared.data(for: versionRequest)
-        print(String(data: data, encoding: .utf8) ?? "")
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
         let decoder = JSONDecoder()
         if let cloudStatus = try? decoder.decode(NextcloudStatus.self, from: data) {
             return cloudStatus
@@ -39,24 +47,50 @@ final class DeckAPI {
         return nil
     }
 
-    func sync() async throws /*-> NewsStatusDTO? */ {
-//        syncState = .started
-//        let hasItems = await backgroundActor.hasItems()
-//        let currentStatus = try await newsStatus()
-//        if hasItems && lastModified > 0 {
+    func capabilities() async throws {
+        let capabilitiesRequest = try OCSRouter.capabilities.urlRequest()
+        let (data, response) = try await URLSession.shared.data(for: capabilitiesRequest)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        let decoder = JSONDecoder()
+        if let capabilities = try? decoder.decode(OCS.self, from: data) {
+            await backgroundActor.insert(capabilities.data.version)
+            if let deckDTO = capabilities.data.deck {
+                await backgroundActor.insert(deckDTO)
+            }
+        }
+    }
+
+    func currentUser(id: String) async throws {
+        let request = try OCSRouter.users(id: id)
+            .urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+//        let boardDTO = try JSONDecoder().decode(BoardSummaryDTO.self, from: data)
+//        await backgroundActor.insert(boardDTO)
+//        try await getBoardDetails(boardIDs: [boardDTO.id])
+    }
+
+    func sync() async throws {
+        try await capabilities()
         let boardIDs = try await syncBoards()
         try await syncBoardDetails(boardIDs: boardIDs)
         try await syncStacks(boardIDs: boardIDs)
-//        } else {
-//            try await initialSync()
-//            if !hasItems {
-//                syncState = .favicons
-//                await getFavIcons()
-//            }
-//            syncState = .idle
-//        }
-//        WidgetCenter.shared.reloadAllTimelines()
-//        return currentStatus
     }
 
     private func syncBoards() async throws -> [Int] {
