@@ -21,6 +21,8 @@ struct StacksColumnView: View {
 
     @State private var showNewStackSheet: Bool = false
     @State private var stackToShowDetails: Stack? = nil
+    @State private var draggedStack: Stack?
+    @State private var targetIndex: Int? = nil
 
     init(boardID: Int?, selectedStackID: Binding<Int?>) {
         self.boardID = boardID
@@ -68,10 +70,24 @@ struct StacksColumnView: View {
                             .fill(boardColor)
                             .frame(height: 9)
                         ForEach(Array(stacks.enumerated()), id: \.element.id) { index, stack in
+
+                            InsertionLine(visible: targetIndex == index)
+
                             NavigationLink(value: stack.id) {
                                 StackRow(stack: stack)
                                     .tag(stack.id)
                                     .padding(.vertical, 6)
+                                    .opacity(draggedStack?.id == stack.id ? 0.4 : 1)
+                                    .draggable(StackDragItem(stackID: stack.id)) {
+                                        StackRow(stack: stack)
+                                            .frame(width: 300)
+                                            .onAppear { draggedStack = stack }
+                                            .onDisappear {
+                                                // Drag ended — reset regardless of how it ended
+                                                draggedStack = nil
+                                                targetIndex = nil
+                                            }
+                                    }
                                     .contextMenu {
                                         Button {
                                             stackToShowDetails = stack
@@ -92,15 +108,53 @@ struct StacksColumnView: View {
                                             Label("Delete", systemImage: "trash")
                                         }
                                     }
+
                             }
                             .buttonStyle(.plain)
+                            .background(
+                                GeometryReader { geo in
+                                    Color.white.opacity(0.001)
+                                        .dropDestination(for: StackDragItem.self) { items, location in
+                                            guard let item = items.first else { return false }
+                                            let insertAt = location.y < geo.size.height / 2
+                                            ? index        // top half → insert above
+                                            : index + 1    // bottom half → insert below
+                                            commitReorder(to: insertAt, stackID: item.stackID)
+                                            return true
+                                        } isTargeted: { isTargeted in
+                                                    guard isTargeted else {
+                                                        if targetIndex == index || targetIndex == index + 1 {
+                                                            targetIndex = nil
+                                                        }
+                                                        return
+                                                    }
+                                                    targetIndex = index
+                                        }
+                                })
                         }
+
+                        Color.white.opacity(0.001)
+                            .frame(height: 44)  // generous hit area
+                            .overlay(InsertionLine(visible: targetIndex == stacks.count))
+                            .dropDestination(for: StackDragItem.self) { items, _ in
+                                guard let item = items.first else { return false }
+                                commitReorder(to: stacks.count, stackID: item.stackID)
+                                return true
+                            } isTargeted: { isTargeted in
+                                targetIndex = isTargeted ? stacks.count : (targetIndex == stacks.count ? nil : targetIndex)
+                            }
+
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                 }
                 .navigationDestination(for: Int.self) { item in
                     CardsColumnView(stackID: item, selectedCardID: $selectedStackID)
+                }
+                .dropDestination(for: StackDragItem.self) { _, _ in
+                    targetIndex = nil
+                    draggedStack = nil
+                    return false
                 }
             }
         }
@@ -123,4 +177,31 @@ struct StacksColumnView: View {
         }
 
     }
+
+    private func commitReorder(to destinationIndex: Int, stackID: Int) {
+        defer {
+            targetIndex = nil
+            draggedStack = nil
+        }
+
+        var reordered = stacks
+
+        guard let fromIndex = reordered.firstIndex(where: { $0.id == stackID })
+        else { return }
+
+        let toIndex = min(destinationIndex, reordered.count)
+
+        reordered.move(fromOffsets: IndexSet(integer: fromIndex), toOffset: toIndex)
+
+        for reverseIndex in stride(from: reordered.count - 1, through: 0, by: -1) {
+            reordered[reverseIndex].order = reverseIndex
+        }
+
+        Task {
+            for stack in reordered {
+                try? await deckAPI.updateStack(boardId: stack.boardId, stackId: stack.id, title: stack.title, order: stack.order)
+            }
+        }
+    }
+
 }
