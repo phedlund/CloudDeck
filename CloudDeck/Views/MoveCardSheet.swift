@@ -24,6 +24,16 @@ struct MoveCardSheet: View {
     @State private var selectedBoardID: Int?
     @State private var selectedStackID: Int?
 
+    var isSaveDisabled: Bool {
+        if isSaving || selectedBoardID == nil || selectedStackID == nil {
+            return true
+        }
+        if selectedBoardID == card.stack?.boardId && selectedStackID == card.stack?.id && !createACopy {
+            return true
+        }
+        return false
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -34,7 +44,6 @@ struct MoveCardSheet: View {
                                 .tag(Optional(board.id))
                         }
                     }
-                    .pickerStyle(.menu)
                     .contentShape(Rectangle())
                     if let boardID = selectedBoardID {
                         StacksPicker(boardID: boardID, selectedStackID: $selectedStackID)
@@ -51,8 +60,11 @@ struct MoveCardSheet: View {
                 }
             }
             .navigationTitle(Text(card.title))
-            .onChange(of: selectedBoardID, initial: false) { oldValue, newValue in
-                selectedStackID = nil
+            .task {
+                if let board = boards.first(where: { card.stack?.boardId == $0.id } ) {
+                    selectedBoardID = board.id
+                }
+                selectedStackID = card.stack?.id
             }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -69,7 +81,7 @@ struct MoveCardSheet: View {
                             }
                         }
                     }
-                    .disabled(isSaving || selectedBoardID == nil || selectedStackID == nil)
+                    .disabled(isSaveDisabled)
                 }
                 ToolbarItem(placement: .cancellationAction) {
                     Button(role: .cancel) { dismiss() }
