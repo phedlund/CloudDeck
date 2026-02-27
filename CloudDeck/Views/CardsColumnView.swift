@@ -25,6 +25,7 @@ struct CardsColumnView: View {
 
     @Query private var cards: [Card]
     @Query private var stacks: [Stack]
+    @Query private var boards: [Board]
 
     init(stackID: Int?, selectedCardID: Binding<Int?>) {
         self.stackID = stackID
@@ -42,6 +43,14 @@ struct CardsColumnView: View {
         stacks.first?.title ?? "Cards"
     }
 
+    private var boardColor: Color {
+        var result = Color.clear
+        if let boardId = stacks.first?.boardId, let board = boards.first(where: { $0.id == boardId }) {
+            result = Color(hex: board.color) ?? .clear
+        }
+        return result
+    }
+
     var body: some View {
         Group {
             if cards.isEmpty {
@@ -53,6 +62,9 @@ struct CardsColumnView: View {
             } else {
                 ScrollView {
                     LazyVStack(spacing: 0) {
+                        Capsule()
+                            .fill(boardColor)
+                            .frame(height: 9)
                         ForEach(Array(cards.enumerated()), id: \.element.id) { index, card in
 
                             InsertionLine(visible: targetIndex == index)

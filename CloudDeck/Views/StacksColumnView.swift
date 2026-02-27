@@ -40,6 +40,14 @@ struct StacksColumnView: View {
         boards.first?.title ?? "Lists"
     }
 
+    private var boardColor: Color {
+        var result = Color.clear
+        if let hexString = boards.first?.color {
+            result = Color(hex: hexString) ?? .clear
+        }
+        return result
+    }
+
     private var cardCounts: [Int: Int] {
         Dictionary(grouping: cards.filter( { $0.archived == false }), by: \.stackId)
             .mapValues(\.count)
@@ -54,38 +62,49 @@ struct StacksColumnView: View {
                     Text("Tap the plus button \(Image(systemName: "plus")) to add one.")
                 }
             } else {
-                List(stacks, selection: $selectedStackID) { stack in
-                    VStack(alignment: .leading) {
-                        Text(stack.title)
-
-                        Text(.cardCount(cardCounts[stack.id, default: 0]))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .tag(stack.id)
-                    .contextMenu {
-                        Button {
-                            stackToShowDetails = stack
-                        } label: {
-                            Label("Edit", systemImage: "pencil")
-                        }
-                        Button {
-                            //
-                        } label: {
-                            Label("Archive all cards", systemImage: "archivebox")
-                        }
-                        .disabled(true)
-                        Button(role: .destructive) {
-                            Task {
-                                try? await deckAPI.deleteStack(boardId: stack.boardId, stackId: stack.id)
+                ScrollView(.vertical) {
+                    LazyVStack(spacing: 0) {
+                        Capsule()
+                            .fill(boardColor)
+                            .frame(height: 9)
+                        ForEach(Array(stacks.enumerated()), id: \.element.id) { index, stack in
+                            NavigationLink(value: stack.id) {
+                                StackRow(stack: stack)
+                                    .tag(stack.id)
+                                    .padding(.vertical, 6)
+                                    .contextMenu {
+                                        Button {
+                                            stackToShowDetails = stack
+                                        } label: {
+                                            Label("Edit", systemImage: "pencil")
+                                        }
+                                        Button {
+                                            //
+                                        } label: {
+                                            Label("Archive all cards", systemImage: "archivebox")
+                                        }
+                                        .disabled(true)
+                                        Button(role: .destructive) {
+                                            Task {
+                                                try? await deckAPI.deleteStack(boardId: stack.boardId, stackId: stack.id)
+                                            }
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
+                                    }
                             }
-                        } label: {
-                            Label("Delete", systemImage: "trash")
+                            .buttonStyle(.plain)
                         }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                }
+                .navigationDestination(for: Int.self) { item in
+                    CardsColumnView(stackID: item, selectedCardID: $selectedStackID)
                 }
             }
         }
+        .background(Color(.systemGroupedBackground))
         .navigationTitle(boardTitle)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {

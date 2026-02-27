@@ -43,10 +43,11 @@ struct ContentView: View {
                         selectedStackID: $selectedStackID
                     )
                 } detail: {
-                    CardsColumnView(
-                        stackID: selectedStackID,
-                        selectedCardID: .constant(nil)
-                    )
+                    EmptyView()
+//                    CardsColumnView(
+//                        stackID: selectedStackID,
+//                        selectedCardID: .constant(nil)
+//                    )
                 }
                 .navigationSplitViewStyle(.balanced)
             } else {
