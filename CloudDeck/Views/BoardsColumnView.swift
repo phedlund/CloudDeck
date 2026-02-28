@@ -33,7 +33,7 @@ struct BoardsColumnView: View {
                     Label {
                         Text(board.title)
                     } icon: {
-                        Circle().fill(Color(hex: board.color) ?? .secondary)
+                        Circle().fill(Color(hex: board.color) ?? .clear)
                     }
                     .tag(board.id)
                     .contextMenu {
