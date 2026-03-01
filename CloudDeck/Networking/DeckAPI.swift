@@ -218,6 +218,9 @@ final class DeckAPI {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .secondsSince1970
         if let boardDTO = try? decoder.decode(BoardDetailDTO.self, from: data) {
+            for labelDTO in boardDTO.labels {
+                try await backgroundActor.insert(labelDTO)
+            }
             try await backgroundActor.insert(boardDTO)
             try? await backgroundActor.save()
         }
@@ -237,6 +240,67 @@ final class DeckAPI {
         guard (response as? HTTPURLResponse)?.statusCode == 200 else {
             throw DeckError.serverError
         }
+    }
+
+    func createBoardLabel(boardId: Int, title: String, color: String) async throws {
+        let request = try Router.createLabel(boardId: boardId, title: title, color: color)
+            .urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        let decoder = JSONDecoder()
+        if let deckLabel = try? decoder.decode(LabelDTO.self, from: data) {
+            try await backgroundActor.insert(deckLabel)
+            try? await backgroundActor.save()
+        }
+    }
+
+    func updateBoardLabel(boardId: Int, labelId: Int, title: String, color: String) async throws {
+        let request = try Router.updateLabel(boardId: boardId, labelId: labelId, title: title, color: color)
+            .urlRequest()
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        let decoder = JSONDecoder()
+        if let deckLabel = try? decoder.decode(LabelDTO.self, from: data) {
+            try await backgroundActor.insert(deckLabel)
+            try? await backgroundActor.save()
+        }
+
+    }
+
+    func deleteBoardLabel(boardId: Int, labelId: Int) async throws {
+        let request = try Router.deleteLabel(boardId: boardId, labelId: labelId)
+            .urlRequest()
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        if let body = String(data: data, encoding: .utf8) {
+            print("SERVER BODY:", body)
+        }
+
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw DeckError.serverError
+        }
+
+        try? await backgroundActor.deleteLabel(boardId: boardId, labelId: labelId)
+        try? await backgroundActor.save()
     }
 
     func createStack(boardId: Int, title: String, order: Int) async throws {

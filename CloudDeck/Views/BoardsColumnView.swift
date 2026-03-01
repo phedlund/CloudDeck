@@ -87,7 +87,7 @@ struct BoardsColumnView: View {
             }
         }
         .sheet(isPresented: $showNewBoardSheet) {
-            NewBoardSheet()
+            NewBoardSheet(titleColorSheetType: .newBoard)
         }
         .sheet(item: $boardToShowDetails) { board in
             EditBoardSheet(board: board)

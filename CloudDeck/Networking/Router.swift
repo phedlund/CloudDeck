@@ -49,6 +49,9 @@ enum Router {
     case archiveCard(boardId: Int, stackId: Int, cardId: Int)
     case deleteCard(boardId: Int, stackId: Int, cardId: Int)
 
+    case createLabel(boardId: Int, title: String, color: String)
+    case updateLabel(boardId: Int, labelId: Int, title: String, color: String)
+    case deleteLabel(boardId: Int, labelId: Int)
     case assignLabel(boardId: Int, stackId: Int, cardId: Int, labelId: Int)
     case removeLabel(boardId: Int, stackId: Int, cardId: Int, labelId: Int)
 
@@ -61,11 +64,11 @@ enum Router {
             return .get
         case .board, .stacks, .cards, .card:
             return .get
-        case .createBoard, .createStack, .createCard:
+        case .createBoard, .createStack, .createCard, .createLabel:
             return .post
-        case .updateBoard, .updateStack, .updateCard, .archiveCard, .assignLabel, .removeLabel, .assignUser, .unassignUser:
+        case .updateBoard, .updateStack, .updateCard, .archiveCard, .updateLabel, .assignLabel, .removeLabel, .assignUser, .unassignUser:
             return .put
-        case .deleteBoard, .deleteStack, .deleteCard:
+        case .deleteBoard, .deleteStack, .deleteCard, .deleteLabel:
             return .delete
         }
     }
@@ -102,6 +105,12 @@ enum Router {
             "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)/archive"
         case .deleteCard(let boardId, let stackId, let cardId):
             "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)"
+        case .createLabel(let boardId, _, _):
+            "/boards/\(boardId)/labels"
+        case .updateLabel(let boardId, let labelId, _, _):
+            "/boards/\(boardId)/labels/\(labelId)"
+        case .deleteLabel(boardId: let boardId, labelId: let labelId):
+            "/boards/\(boardId)/labels/\(labelId)"
         case .assignLabel(let boardId, let stackId, let cardId, _):
             "/boards/\(boardId)/stacks/\(stackId)/cards/\(cardId)/assignLabel"
         case .removeLabel(let boardId, let stackId, let cardId, _):
@@ -182,6 +191,26 @@ enum Router {
                 "description": description
             ]
 
+            return try? JSONSerialization.data(
+                withJSONObject: payload.compactMapValues { $0 }
+            )
+
+        case .createLabel(_, title: let title, color: let color):
+            let payload: [String: Any?] = [
+                "title": title,
+                "color": color
+            ]
+            
+            return try? JSONSerialization.data(
+                withJSONObject: payload.compactMapValues { $0 }
+            )
+
+        case .updateLabel(_, _, let title, let color):
+            let payload: [String: Any?] = [
+                "title": title,
+                "color": color
+            ]
+            
             return try? JSONSerialization.data(
                 withJSONObject: payload.compactMapValues { $0 }
             )

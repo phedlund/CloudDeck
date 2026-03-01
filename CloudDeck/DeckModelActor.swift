@@ -62,6 +62,16 @@ extension DeckModelActor {
         try modelContext.save()
     }
 
+    func insert(_ dto: LabelDTO) throws {
+        let label = DeckLabel(dto: dto)
+        let board = fetchBoard(id: dto.boardId)
+        if let board {
+            label.board = board
+        }
+        modelContext.insert(label)
+        try modelContext.save()
+    }
+
 //    func deleteBoard(boardId: Int) {
 //        if let board = fetchBoard(id: boardId) {
 //            modelContext.delete(board)
@@ -166,6 +176,13 @@ extension DeckModelActor {
         modelContext.insert(card)
         try modelContext.save()
     }
+
+    func deleteLabel(boardId: Int, labelId: Int) throws {
+        if let existing = fetchLabel(boardId: boardId, labelId: labelId) {
+            modelContext.delete(existing)
+            try? modelContext.save()
+        }
+    }
 }
 
 extension DeckModelActor {
@@ -191,6 +208,14 @@ extension DeckModelActor {
     private func fetchCard(id: Int) -> Card? {
         let descriptor = FetchDescriptor<Card>(
             predicate: #Predicate { $0.id == id },
+            sortBy: []
+        )
+        return try? modelContext.fetch(descriptor).first
+    }
+
+    private func fetchLabel(boardId: Int, labelId: Int) -> DeckLabel? {
+        let descriptor = FetchDescriptor<DeckLabel>(
+            predicate: #Predicate { $0.id == labelId && $0.boardId == boardId },
             sortBy: []
         )
         return try? modelContext.fetch(descriptor).first

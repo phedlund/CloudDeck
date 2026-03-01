@@ -14,7 +14,7 @@ struct LabelDTO: Codable {
     let color: String
     let boardId: Int
     let cardId: Int?
-    @EpochDateOrNil var lastModified: Date?
+    let lastModified: Int?
     let ETag: String
 }
 
@@ -52,11 +52,16 @@ final class DeckLabel {
 extension DeckLabel {
 
     convenience init(dto: LabelDTO) {
+        var lastModified: Date?
+        if let dtoLastModified = dto.lastModified, dtoLastModified != 0 {
+            lastModified = Date(timeIntervalSince1970: TimeInterval(dtoLastModified))
+        }
         self.init(id: dto.id,
                   title: dto.title,
                   color: dto.color,
                   boardId: dto.boardId,
-                  lastModified: dto.lastModified,
+                  cardId: dto.cardId,
+                  lastModified: lastModified,
                   ETag: dto.ETag)
     }
     

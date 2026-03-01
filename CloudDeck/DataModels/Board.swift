@@ -167,39 +167,13 @@ extension Board {
         )
     }
 
-    convenience init(dto: BoardDetailDTO) {
-
-        let userModels = dto.users.map { User(dto: $0) }
-
-        self.init(
-            id: dto.id,
-            title: dto.title,
-            color: dto.color,
-            archived: dto.archived,
-            deletedAt: dto.deletedAt,
-            lastModified: dto.lastModified,
-            eTag: dto.eTag,
-            owner: .init(dto: dto.owner),
-            users: userModels
-        )
-    }
-
 }
 
 extension Board {
-    func applySummary(from dto: BoardSummaryDTO) {
-        title = dto.title
-        color = dto.color
-        archived = dto.archived
-        deletedAt = dto.deletedAt
-        lastModified = dto.lastModified
-        eTag = dto.eTag
-    }
 
     func applyDetail(from dto: BoardDetailDTO) {
 
         let stackModels = dto.stacks.map { Stack(dto: $0) }
-        let labelModels = dto.labels.map { DeckLabel(dto: $0) }
 
         title = dto.title
         color = dto.color
@@ -208,7 +182,6 @@ extension Board {
         lastModified = dto.lastModified
         eTag = dto.eTag
         stacks = stackModels
-        labels = labelModels
         permissions = Permissions(canRead: dto.permissions.canRead,
                                   canEdit: dto.permissions.canEdit,
                                   canManage: dto.permissions.canManage,

@@ -5,6 +5,7 @@
 //  Created by Peter Hedlund on 2/13/26.
 //
 
+import SwiftData
 import SwiftUI
 
 struct EditBoardSheet: View {
@@ -18,7 +19,18 @@ struct EditBoardSheet: View {
 
     @FocusState private var isTextFieldFocused: Bool
 
+    @State private var showNewLabelSheet: Bool = false
+    @State private var labelToShowDetails: DeckLabel? = nil
+
     var board: Board
+
+    @Query private var labels: [DeckLabel]
+
+    init(board: Board) {
+        self.board = board
+        let boardId = board.id
+        _labels = Query(filter: #Predicate<DeckLabel> { $0.boardId == boardId }, sort: \.title)
+    }
 
     var body: some View {
         NavigationStack {
@@ -36,28 +48,30 @@ struct EditBoardSheet: View {
                 }
                 Section {
                     List {
-                        ForEach(board.labels.sorted(by: { $0.title < $1.title } )) { label in
+                        ForEach(labels) { label in
                             HStack(spacing: 12) {
                                 ChipView(title: label.title, colorHex: label.color)
                                 Spacer()
                                 Button {
-                                    Task {
-                    //
-                                    }
+                                    labelToShowDetails = label
                                 } label: {
                                     Label("Edit", systemImage: "pencil")
                                         .labelStyle(.iconOnly)
                                 }
                                 Button(role: .destructive) {
-//
+                                    labelToShowDetails = nil
+                                    Task {
+                                        try? await deckAPI.deleteBoardLabel(boardId: label.boardId, labelId: label.id)
+                                    }
                                 } label: {
                                     Label("Delete", systemImage: "trash")
                                         .labelStyle(.iconOnly)
                                 }
                             }
+                            .buttonStyle(.borderless)
                         }
                         Button {
-                            //
+                            showNewLabelSheet = true
                         } label: {
                             Text("Add Label")
                         }
@@ -90,12 +104,23 @@ struct EditBoardSheet: View {
                 }
 
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(role: .cancel) { dismiss() }
+                    Button(role: .cancel) {
+                        showNewLabelSheet = false
+                        labelToShowDetails = nil
+                        dismiss()
+                    }
                 }
             }
         }
         .onChange(of: color, initial: true) {_, newValue in
             colorHex = newValue.hexString
         }
+        .sheet(isPresented: $showNewLabelSheet) {
+            NewBoardSheet(titleColorSheetType: .newLabel(boardID: board.id))
+        }
+        .sheet(item: $labelToShowDetails) { label in
+            NewBoardSheet(titleColorSheetType: .editLabel(label: label))
+        }
+
     }
 }
