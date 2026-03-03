@@ -17,27 +17,25 @@ struct CardContextMenu: View {
 
     let card: Card
 
+    var isMeAssigned: Bool {
+        card.assignedUsers.contains(where: { $0.isDeleted == false && $0.user.uid == authManager.currentAccount()?.username })
+    }
+
     var body: some View {
         Group {
             Button {
                 if let username = authManager.currentAccount()?.username {
                     Task {
-                        let backgroundActor = DeckModelActor(modelContainer: modelContext.container)
-                        if let stack = await backgroundActor.fetchStack(id: card.stackId) {
-                            if let board = await backgroundActor.fetchBoard(id: stack.boardId),
-                               let me = board.users.filter(
-                                { $0.uid == username }
-                               ).first {
-                                
-                                try? await deckAPI.assignUser(card: card, user: me)
-                            }
-                        }
+                        await updateMyAssignmentState(username: username)
                     }
                 }
             } label: {
-                Label("Assign to me", systemImage: "person")
+                if isMeAssigned {
+                    Label("Unassign me", systemImage: "person.slash")
+                } else {
+                    Label("Assign to me", systemImage: "person")
+                }
             }
-            //                        .disabled(true)
             Button {
                 Task {
                     try? await deckAPI.setCardDone(card: card, done: true)
@@ -68,6 +66,21 @@ struct CardContextMenu: View {
                 Label("Delete", systemImage: "trash")
             }
         }
-        
+    }
+
+    private func updateMyAssignmentState(username: String) async {
+        let backgroundActor = DeckModelActor(modelContainer: modelContext.container)
+        if let stack = await backgroundActor.fetchStack(id: card.stackId) {
+            if let board = await backgroundActor.fetchBoard(id: stack.boardId),
+               let me = board.users.filter(
+                { $0.uid == username }
+               ).first {
+                if isMeAssigned {
+                    try? await deckAPI.unassignUser(card: card, user: me)
+                } else {
+                    try? await deckAPI.assignUser(card: card, user: me)
+                }
+            }
+        }
     }
 }
