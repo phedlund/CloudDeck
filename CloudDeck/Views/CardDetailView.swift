@@ -26,8 +26,10 @@ struct CardDetailView: View {
 
     var boardLabels: [DeckLabel] {
         if let board = boards.first( where: { $0.id == card.stack?.boardId } ) {
-            let labels = board.labels
-            return labels
+            let boardLabels = board.labels
+            let cardLabels = card.labels
+            let unassignedLabels = boardLabels.filter { !cardLabels.contains($0) }
+            return unassignedLabels
         }
         return []
     }
@@ -35,7 +37,9 @@ struct CardDetailView: View {
     var boardUsers: [User] {
         if let board = boards.first( where: { $0.id == card.stack?.boardId } ) {
             let users = board.users
-            return users
+            let cardUsers = card.assignedUsers.map { $0.user.uid }
+
+            return users.filter { !cardUsers.contains($0.uid) }
         }
         return []
     }
