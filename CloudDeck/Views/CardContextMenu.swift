@@ -38,12 +38,11 @@ struct CardContextMenu: View {
             }
             Button {
                 Task {
-                    try? await deckAPI.setCardDone(card: card, done: true)
+                    try? await deckAPI.setCardDone(card: card, done: card.doneAt == nil)
                 }
             } label: {
-                Label("Mark as done", systemImage: "checkmark")
+                Label(card.doneAt != nil ? "Reopen" : "Mark as done", systemImage: "checkmark")
             }
-            .disabled(card.doneAt != nil)
             Button {
                 cardToMove = card
             } label: {
