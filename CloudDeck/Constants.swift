@@ -51,4 +51,10 @@ struct Constants {
         //    static let hasWidgets = "HasWidgets"
         static let etag = "etag"
     }
+
+    static let email = "support@pbh.dev"
+    static let website = "https://pbh.dev/cloud-deck"
+    static let subject = NSLocalizedString("CloudDeck Support Request", comment: "Support email subject")
+    static let message = NSLocalizedString("<Please state your question or problem here>", comment: "Support email body placeholder")
+
 }

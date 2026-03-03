@@ -10,7 +10,16 @@
     "%lld" : {
 
     },
+    "<Please state your question or problem here>" : {
+      "comment" : "Support email body placeholder"
+    },
     "Account" : {
+
+    },
+    "Acknowledgements" : {
+
+    },
+    "Acknowledgements..." : {
 
     },
     "Actions" : {
@@ -84,10 +93,16 @@
     "Clear Date" : {
 
     },
+    "CloudDeck Support Request" : {
+      "comment" : "Support email subject"
+    },
     "Color" : {
 
     },
     "Connect to Nextcloud" : {
+
+    },
+    "Contact" : {
 
     },
     "Created %@" : {
@@ -200,6 +215,9 @@
     "Stack" : {
 
     },
+    "Support" : {
+
+    },
     "Tap the plus button %@ to add one." : {
 
     },
@@ -224,6 +242,9 @@
           }
         }
       }
+    },
+    "Web Site" : {
+
     }
   },
   "version" : "1.1"
