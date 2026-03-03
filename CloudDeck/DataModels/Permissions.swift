@@ -49,29 +49,6 @@ final class Permissions {
 
 }
 
-struct ACLItemDTO: Decodable {
-    let uid: String
-    let permission: String
-}
-
-@Model
-final class ACLItem {
-    var uid: String
-    var permission: String
-
-    init(uid: String, permission: String) {
-        self.uid = uid
-        self.permission = permission
-    }
-
-    convenience init(dto: ACLItemDTO) {
-        self.init(
-            uid: dto.uid,
-            permission: dto.permission
-        )
-    }
-}
-
 struct ActiveSessionDTO: Decodable {
     let userId: String
     let lastSeen: Date

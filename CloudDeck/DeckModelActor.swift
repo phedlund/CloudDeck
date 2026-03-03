@@ -222,3 +222,23 @@ extension DeckModelActor {
     }
 }
 
+extension DeckModelActor {
+    func reset() throws {
+        do {
+            try modelContext.delete(model: Board.self)
+            try modelContext.delete(model: Stack.self)
+            try modelContext.delete(model: Card.self)
+            try modelContext.delete(model: DeckLabel.self)
+            try modelContext.delete(model: User.self)
+            try modelContext.delete(model: AssignedUser.self)
+            try modelContext.delete(model: Permissions.self)
+            try modelContext.delete(model: ACLItem.self)
+            try modelContext.delete(model: ActiveSession.self)
+            try modelContext.delete(model: BoardSettings.self)
+            try modelContext.delete(model: OCSVersion.self)
+            try modelContext.delete(model: Deck.self)
+        } catch {
+            //                throw DatabaseError.generic(message: "Failed to clear the local database")
+        }
+    }
+}

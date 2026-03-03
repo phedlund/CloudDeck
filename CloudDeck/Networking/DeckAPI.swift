@@ -130,9 +130,8 @@ final class DeckAPI {
             if let response = response as? HTTPURLResponse {
                 switch response.statusCode {
                 case 200:
-                    let headers = response.allHeaderFields
-                    for header in headers {
-                        print("\(header.key): \(header.value)")
+                    if let body = String(data: data, encoding: .utf8) {
+                        print("SERVER BODY:", body)
                     }
 
                     let decoder = JSONDecoder()

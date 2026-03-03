@@ -136,7 +136,8 @@ final class Board {
          lastModified: Date? = nil,
          eTag: String = "",
          owner: User,
-         users: [User] = []) {
+         users: [User] = [],
+         acl: [ACLItem] = []) {
         self.id = id
         self.title = title
         self.color = color
@@ -146,6 +147,7 @@ final class Board {
         self.eTag = eTag
         self.owner = owner
         self.users = users
+        self.acl = acl
     }
 }
 
@@ -163,7 +165,8 @@ extension Board {
             lastModified: dto.lastModified,
             eTag: dto.eTag,
             owner: .init(dto: dto.owner),
-            users: userModels
+            users: userModels,
+            acl: []
         )
     }
 
@@ -174,6 +177,8 @@ extension Board {
     func applyDetail(from dto: BoardDetailDTO) {
 
         let stackModels = dto.stacks.map { Stack(dto: $0) }
+        let userModels = dto.users.map { User(dto: $0) }
+        let aclModels = dto.acl.map { ACLItem(dto: $0) }
 
         title = dto.title
         color = dto.color
@@ -186,10 +191,10 @@ extension Board {
                                   canEdit: dto.permissions.canEdit,
                                   canManage: dto.permissions.canManage,
                                   canShare: dto.permissions.canShare)
-        users = dto.users.map(User.init)
+        users = userModels
 //        activeSessions = dto.activeSessions.map(ActiveSession.init)
 //        settings = BoardSettings(notifyDue: dto.settings["notify-due"],
 //                                 calendar: dto.settings["calendar"])
-        acl = dto.acl.map { ACLItem(uid: $0.uid, permission: $0.permission) }
+        acl = aclModels
     }
 }
