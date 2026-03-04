@@ -38,6 +38,43 @@ struct CardDTO: Codable, Identifiable {
     @ISO8601DateOrNil var duedate: Date?
 }
 
+struct NewCardDTO: Codable, Identifiable {
+    let id: Int
+    let title: String
+    let description: String
+    let descriptionPrev: String
+    let stackId: Int
+    let type: String
+    let lastModified: Int
+    let lastEditor: String
+    let createdAt: Int
+    let labels: [LabelDTO]
+    let assignedUsers: [AssignedUserDTO]?
+//    let attachments: [AttachmentDTO]?
+    let attachmentCount: Int?
+    let owner: UserDTO
+    let order: Int
+    let archived: Bool
+    @ISO8601DateOrNil var done: Date?
+    @ISO8601DateOrNil var duedate: Date?
+    let notified: Bool
+    let deletedAt: Int
+    let commentsUnread: Int
+    let commentsCount: Int
+    let relatedStack: StackDTO?
+    let relatedBoard: BoardSummaryDTO?
+    let eTag: String
+
+    enum CodingKeys: String, CodingKey {
+        case id, title, description, descriptionPrev, stackId, type
+        case lastModified, lastEditor, createdAt, labels, assignedUsers
+        case attachmentCount, owner, order, archived, done
+        case duedate, notified, deletedAt, commentsUnread, commentsCount
+        case relatedStack, relatedBoard
+        case eTag = "ETag"
+    }
+}
+
 @Model
 final class Card {
     @Attribute(.unique) var id: Int
@@ -133,6 +170,36 @@ extension Card {
             attachmentCount: dto.attachmentCount,
             commentsCount: dto.commentsCount,
             overdue: dto.overdue
+        )
+    }
+
+    convenience init(dto: NewCardDTO) {
+
+        let labelModels = dto.labels.map { DeckLabel(dto: $0) }
+        var assignedUsers: [AssignedUser]? = nil
+        if let dtoAssignedUsers = dto.assignedUsers {
+            assignedUsers = dtoAssignedUsers.map { AssignedUser(dto: $0) }
+        }
+
+        self.init(
+            id: dto.id,
+            title: dto.title,
+            description: dto.description,
+            stackId: dto.stackId,
+            type: dto.type,
+            order: dto.order,
+            archived: dto.archived,
+            labels: labelModels,
+            createdAt: dto.createdAt == 0 ? nil : Date(timeIntervalSince1970: TimeInterval(dto.createdAt)),
+            lastModified: dto.lastModified == 0 ? nil : Date(timeIntervalSince1970: TimeInterval(dto.lastModified)),
+            doneAt: dto.done,
+            dueDate: dto.duedate,
+            deletedAt: dto.deletedAt == 0 ? nil : Date(timeIntervalSince1970: TimeInterval(dto.deletedAt)),
+            owner: .init(dto: dto.owner),
+            assignedUsers: assignedUsers ?? [],
+            attachmentCount: dto.attachmentCount ?? 0,
+            commentsCount: dto.commentsCount,
+            overdue: 0
         )
     }
 

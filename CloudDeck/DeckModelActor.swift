@@ -177,6 +177,17 @@ extension DeckModelActor {
         try modelContext.save()
     }
 
+    func addCard(from dto: NewCardDTO) throws {
+        guard let stack = fetchStack(id: dto.stackId) else {
+            return
+//            throw DeckSyncError.missingStack(dto.stackId)
+        }
+        let card = Card(dto: dto)
+        card.stack = stack
+        modelContext.insert(card)
+        try modelContext.save()
+    }
+
     func deleteLabel(boardId: Int, labelId: Int) throws {
         if let existing = fetchLabel(boardId: boardId, labelId: labelId) {
             modelContext.delete(existing)

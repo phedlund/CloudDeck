@@ -663,6 +663,10 @@ final class DeckAPI {
         guard (response as? HTTPURLResponse)?.statusCode == 200 else {
             throw DeckError.serverError
         }
+
+        let cardDTO = try JSONDecoder().decode(NewCardDTO.self, from: data)
+        print(cardDTO)
+        try await backgroundActor.addCard(from: cardDTO)
     }
 
     func assignCardLabel(card: Card, label: DeckLabel) async throws {

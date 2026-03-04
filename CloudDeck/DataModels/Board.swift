@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 // Summary DTO — returned by GET /boards
-struct BoardSummaryDTO: Decodable {
+struct BoardSummaryDTO: Codable {
     let id: Int
     let title: String
     let color: String
