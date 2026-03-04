@@ -50,6 +50,7 @@ struct CardRow: View {
                             if dueDate < Date() {
                                 Label {
                                     Text("\(formattedRelativeTime(from: dueDate, relativeTo: Date()))")
+                                        .lineLimit(1)
                                 } icon: {
                                     Image(systemName: "clock")
                                         .symbolVariant(.fill)
@@ -63,6 +64,7 @@ struct CardRow: View {
                             } else {
                                 Label {
                                     Text("\(formattedRelativeTime(from: dueDate, relativeTo: Date()))")
+                                        .lineLimit(1)
                                 } icon: {
                                     Image(systemName: "clock")
                                 }
