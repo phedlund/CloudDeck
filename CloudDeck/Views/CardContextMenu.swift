@@ -22,48 +22,46 @@ struct CardContextMenu: View {
     }
 
     var body: some View {
-        Group {
-            Button {
-                if let username = authManager.currentAccount()?.username {
-                    Task {
-                        await updateMyAssignmentState(username: username)
-                    }
-                }
-            } label: {
-                if isMeAssigned {
-                    Label("Unassign me", systemImage: "person.slash")
-                } else {
-                    Label("Assign to me", systemImage: "person")
-                }
-            }
-            Button {
+        Button {
+            if let username = authManager.currentAccount()?.username {
                 Task {
-                    try? await deckAPI.setCardDone(card: card, done: card.doneAt == nil)
+                    await updateMyAssignmentState(username: username)
                 }
-            } label: {
-                Label(card.doneAt != nil ? "Reopen" : "Mark as done", systemImage: "checkmark")
             }
-            Button {
-                cardToMove = card
-            } label: {
-                Label("Move/Copy", systemImage: "square.and.arrow.up.on.square")
+        } label: {
+            if isMeAssigned {
+                Label("Unassign me", systemImage: "person.slash")
+            } else {
+                Label("Assign to me", systemImage: "person")
             }
-            .disabled(false)
-            Button {
-                Task {
-                    try? await deckAPI.setCardArchived(card: card, archived: true)
-                }
-            } label: {
-                Label("Archive", systemImage: "archivebox")
+        }
+        Button {
+            Task {
+                try? await deckAPI.setCardDone(card: card, done: card.doneAt == nil)
             }
-            .disabled(card.archived)
-            Button(role: .destructive) {
-                Task {
-                    try? await deckAPI.deleteCard(boardId: card.stack?.boardId ?? 0, stackId: card.stack?.id ?? 0, cardId: card.id)
-                }
-            } label: {
-                Label("Delete", systemImage: "trash")
+        } label: {
+            Label(card.doneAt != nil ? "Reopen" : "Mark as done", systemImage: "checkmark")
+        }
+        Button {
+            cardToMove = card
+        } label: {
+            Label("Move/Copy", systemImage: "square.and.arrow.up.on.square")
+        }
+        .disabled(false)
+        Button {
+            Task {
+                try? await deckAPI.setCardArchived(card: card, archived: true)
             }
+        } label: {
+            Label("Archive", systemImage: "archivebox")
+        }
+        .disabled(card.archived)
+        Button(role: .destructive) {
+            Task {
+                try? await deckAPI.deleteCard(boardId: card.stack?.boardId ?? 0, stackId: card.stack?.id ?? 0, cardId: card.id)
+            }
+        } label: {
+            Label("Delete", systemImage: "trash")
         }
     }
 
