@@ -50,7 +50,7 @@ struct CardContextMenu: View {
         .disabled(false)
         Button {
             Task {
-                try? await deckAPI.setCardArchived(card: card, archived: true)
+                try? await deckAPI.archiveCard(boardId: card.stack?.boardId ?? 0, stackId: card.stack?.id ?? 0, cardId: card.id)
             }
         } label: {
             Label("Archive", systemImage: "archivebox")

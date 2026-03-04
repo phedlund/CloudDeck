@@ -42,11 +42,11 @@ struct NewCardDTO: Codable, Identifiable {
     let id: Int
     let title: String
     let description: String
-    let descriptionPrev: String
+    let descriptionPrev: String?
     let stackId: Int
     let type: String
     let lastModified: Int
-    let lastEditor: String
+    let lastEditor: String?
     let createdAt: Int
     let labels: [LabelDTO]
     let assignedUsers: [AssignedUserDTO]?

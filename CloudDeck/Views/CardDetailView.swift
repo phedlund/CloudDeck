@@ -171,7 +171,7 @@ struct CardDetailView: View {
                                 Button {
                                     Task {
                                         do {
-                                            try await deckAPI.setCardArchived(card: card, archived: true)
+                                            try await deckAPI.archiveCard(boardId: card.stack?.boardId ?? 0, stackId: card.stack?.id ?? 0, cardId: card.id)
                                         } catch {
                                             //
                                         }
