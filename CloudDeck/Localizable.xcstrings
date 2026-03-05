@@ -192,6 +192,9 @@
     "Select" : {
 
     },
+    "Select a board to see its lists" : {
+
+    },
     "Select board and list" : {
       "extractionState" : "stale",
       "localizations" : {

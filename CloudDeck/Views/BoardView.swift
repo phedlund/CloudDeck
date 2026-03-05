@@ -41,87 +41,95 @@ struct BoardView: View {
     }
 
     var body: some View {
-        ScrollView(.horizontal) {
-            LazyHStack(alignment: .top, spacing: 16) {
-                ForEach(Array(stacks.enumerated()), id: \.element.id) { index, stack in
+        if boardID == nil {
+            ContentUnavailableView {
+                Label("No Lists Available", systemImage: "list.dash")
+            } description: {
+                Text("Select a board to see its lists")
+            }
+        } else {
+            ScrollView(.horizontal) {
+                LazyHStack(alignment: .top, spacing: 16) {
+                    ForEach(Array(stacks.enumerated()), id: \.element.id) { index, stack in
 
-                    // Vertical insertion line before each stack
-                    VerticalInsertionLine(visible: targetStackIndex == index)
+                        // Vertical insertion line before each stack
+                        VerticalInsertionLine(visible: targetStackIndex == index)
 
-                    StackColumnView(stack: stack, onMove: handleMove, selectedCard: $selectedCard)
-                        .environment(deckAPI)
-                        .frame(width: 320)
-                        .opacity(draggedStack?.id == stack.id ? 0.4 : 1)
-                        .background(
-                            GeometryReader { geo in
-                                Color.clear.onAppear { stackHeight = geo.size.height }
-                            }
-                        )
-                        .draggable(StackDragItem(stackID: stack.id)) {
-                            StackDragPreview(title: stack.title)
-                                .onAppear { draggedStack = stack }
-                                .onDisappear {
-                                    draggedStack = nil
-                                    targetStackIndex = nil
+                        StackColumnView(stack: stack, onMove: handleMove, selectedCard: $selectedCard)
+                            .environment(deckAPI)
+                            .frame(width: 320)
+                            .opacity(draggedStack?.id == stack.id ? 0.4 : 1)
+                            .background(
+                                GeometryReader { geo in
+                                    Color.clear.onAppear { stackHeight = geo.size.height }
                                 }
-                        }
-                        .background (
-                            GeometryReader { geo in
-                                Color.white.opacity(0.001)
-                                    .dropDestination(for: StackDragItem.self) { items, location in
-                                        guard let item = items.first else { return false }
-                                        let insertAt = location.x < geo.size.width / 2
-                                            ? index
-                                            : index + 1
-                                        commitStackReorder(to: insertAt, stackID: item.stackID)
-                                        return true
-                                    } isTargeted: { isTargeted in
-                                        guard isTargeted else {
-                                            if targetStackIndex == index || targetStackIndex == index + 1 {
-                                                targetStackIndex = nil
-                                            }
-                                            return
-                                        }
-                                        targetStackIndex = index
+                            )
+                            .draggable(StackDragItem(stackID: stack.id)) {
+                                StackDragPreview(title: stack.title)
+                                    .onAppear { draggedStack = stack }
+                                    .onDisappear {
+                                        draggedStack = nil
+                                        targetStackIndex = nil
                                     }
                             }
-                        )
-                }
-
-                // Trailing insertion line + drop target
-                Color.white.opacity(0.001)
-                    .frame(width: 44, height: stackHeight)  // generous hit area
-                    .overlay(VerticalInsertionLine(visible: targetStackIndex == stacks.count))
-                    .dropDestination(for: StackDragItem.self) { items, _ in
-                        guard let item = items.first else { return false }
-                        commitStackReorder(to: stacks.count, stackID: item.stackID)
-                        return true
-                    } isTargeted: { isTargeted in
-                        targetStackIndex = isTargeted ? stacks.count : (targetStackIndex == stacks.count ? nil : targetStackIndex)
+                            .background (
+                                GeometryReader { geo in
+                                    Color.white.opacity(0.001)
+                                        .dropDestination(for: StackDragItem.self) { items, location in
+                                            guard let item = items.first else { return false }
+                                            let insertAt = location.x < geo.size.width / 2
+                                            ? index
+                                            : index + 1
+                                            commitStackReorder(to: insertAt, stackID: item.stackID)
+                                            return true
+                                        } isTargeted: { isTargeted in
+                                            guard isTargeted else {
+                                                if targetStackIndex == index || targetStackIndex == index + 1 {
+                                                    targetStackIndex = nil
+                                                }
+                                                return
+                                            }
+                                            targetStackIndex = index
+                                        }
+                                }
+                            )
                     }
-            }
-            .padding()
-        }
-        .dropDestination(for: StackDragItem.self) { _, _ in
-            targetStackIndex = nil
-            draggedStack = nil
-            return false
-        }
-        .background(Color(.systemGroupedBackground))
-        .navigationTitle(boardTitle)
-        .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                Button {
-                    showNewStackSheet = true
-                } label: {
-                    Image(systemName: "plus")
+
+                    // Trailing insertion line + drop target
+                    Color.white.opacity(0.001)
+                        .frame(width: 44, height: stackHeight)  // generous hit area
+                        .overlay(VerticalInsertionLine(visible: targetStackIndex == stacks.count))
+                        .dropDestination(for: StackDragItem.self) { items, _ in
+                            guard let item = items.first else { return false }
+                            commitStackReorder(to: stacks.count, stackID: item.stackID)
+                            return true
+                        } isTargeted: { isTargeted in
+                            targetStackIndex = isTargeted ? stacks.count : (targetStackIndex == stacks.count ? nil : targetStackIndex)
+                        }
                 }
-                .disabled(boardID == nil)
+                .padding()
             }
-        }
-        .sheet(isPresented: $showNewStackSheet) {
-            NewStackSheet(boardId: boardID ?? 0)
-        }
+            .dropDestination(for: StackDragItem.self) { _, _ in
+                targetStackIndex = nil
+                draggedStack = nil
+                return false
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle(boardTitle)
+            .toolbar {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button {
+                        showNewStackSheet = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .disabled(boardID == nil)
+                }
+            }
+            .sheet(isPresented: $showNewStackSheet) {
+                NewStackSheet(boardId: boardID ?? 0)
+            }
+    }
     }
 
     private func commitStackReorder(to destinationIndex: Int, stackID: Int) {
