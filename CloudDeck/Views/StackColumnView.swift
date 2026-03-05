@@ -83,71 +83,70 @@ struct StackColumnView: View {
             }
             .padding()
 
-            ScrollView {
-                LazyVStack(spacing: 0) {
-                    ForEach(Array(cards.enumerated()), id: \.element.id) { index, card in
+            GeometryReader { scrollGeo in
+                ScrollView {
+                    LazyVStack(spacing: 0) {
+                        ForEach(Array(cards.enumerated()), id: \.element.id) { index, card in
 
-                        InsertionLine(visible: targetIndex == index)
+                            InsertionLine(visible: targetIndex == index)
 
-                        CardRow(card: card)
-                            .padding(.vertical, 6)
-                            .opacity(draggedCard?.id == card.id ? 0.4 : 1)
-                            .draggable(CardDragItem(cardID: card.id)) {
-                                CardRow(card: card)
-                                    .frame(width: 300)
-                                    .onAppear { draggedCard = card }
-                                    .onDisappear {
-                                        // Drag ended — reset regardless of how it ended
-                                        draggedCard = nil
-                                        targetIndex = nil
-                                    }
-                            }
-                            .onTapGesture {
-                                activeSheet = SheetItem(id: card.id)
-                            }
-                            .contextMenu {
-                                CardContextMenu(cardToMove: $cardToMove, card: card)
-                            }
-                            .background(
-                                GeometryReader { geo in
-                                    Color.white.opacity(0.001)
-                                        .dropDestination(for: CardDragItem.self) { items, location in
-                                            guard let item = items.first else { return false }
-                                            let insertAt = location.y < geo.size.height / 2
-                                            ? index        // top half → insert above
-                                            : index + 1    // bottom half → insert below
-                                            commitReorder(to: insertAt, cardID: item.cardID)
-                                            return true
-                                        } isTargeted: { isTargeted in
-                                            guard isTargeted else {
-                                                if targetIndex == index || targetIndex == index + 1 {
-                                                    targetIndex = nil
-                                                }
-                                                return
-                                            }
-                                            targetIndex = index
+                            CardRow(card: card)
+                                .padding(.vertical, 6)
+                                .opacity(draggedCard?.id == card.id ? 0.4 : 1)
+                                .draggable(CardDragItem(cardID: card.id)) {
+                                    CardRow(card: card)
+                                        .frame(width: 300)
+                                        .onAppear { draggedCard = card }
+                                        .onDisappear {
+                                            // Drag ended — reset regardless of how it ended
+                                            draggedCard = nil
+                                            targetIndex = nil
                                         }
                                 }
-                            )
-                    }
-
-                    Color.white.opacity(0.001)
-                        .frame(height: 44)  // generous hit area
-                        .overlay(InsertionLine(visible: targetIndex == cards.count))
-                        .dropDestination(for: CardDragItem.self) { items, _ in
-                            guard let item = items.first else { return false }
-                            commitReorder(to: cards.count, cardID: item.cardID)
-                            return true
-                        } isTargeted: { isTargeted in
-                            targetIndex = isTargeted ? cards.count : (targetIndex == cards.count ? nil : targetIndex)
+                                .onTapGesture {
+                                    activeSheet = SheetItem(id: card.id)
+                                }
+                                .contextMenu {
+                                    CardContextMenu(cardToMove: $cardToMove, card: card)
+                                }
+                                .background(
+                                    GeometryReader { geo in
+                                        Color.white.opacity(0.001)
+                                            .dropDestination(for: CardDragItem.self) { items, location in
+                                                guard let item = items.first else { return false }
+                                                let insertAt = location.y < geo.size.height / 2
+                                                ? index        // top half → insert above
+                                                : index + 1    // bottom half → insert below
+                                                commitReorder(to: insertAt, cardID: item.cardID)
+                                                return true
+                                            } isTargeted: { isTargeted in
+                                                guard isTargeted else {
+                                                    if targetIndex == index || targetIndex == index + 1 {
+                                                        targetIndex = nil
+                                                    }
+                                                    return
+                                                }
+                                                targetIndex = index
+                                            }
+                                    }
+                                )
                         }
+
+                        Color.white.opacity(0.001)
+                            .frame(maxWidth: .infinity)
+                            .frame(minHeight: max(44, scrollGeo.size.height - CGFloat(cards.count) * 76))
+                            .overlay(InsertionLine(visible: targetIndex == cards.count), alignment: .top)
+                            .dropDestination(for: CardDragItem.self) { items, _ in
+                                guard let item = items.first else { return false }
+                                commitReorder(to: cards.count, cardID: item.cardID)
+                                return true
+                            } isTargeted: { isTargeted in
+                                targetIndex = isTargeted ? cards.count : (targetIndex == cards.count ? nil : targetIndex)
+                            }
+                    }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
-            }
-            .dropDestination(for: CardDragItem.self) { _, _ in
-                targetIndex = nil
-                draggedCard = nil
-                return false
+                .frame(maxHeight: .infinity)
             }
         }
         .frame(maxHeight: .infinity)
