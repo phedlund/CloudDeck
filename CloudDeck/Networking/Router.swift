@@ -123,121 +123,54 @@ enum Router {
     }
 
     private var body: Data? {
+        payload.flatMap { try? JSONSerialization.data(withJSONObject: $0) }
+    }
+
+    private var payload: [String: Any]? {
         switch self {
-
         case .updateCard(_, _, _, let title, let description, let type, let owner, let order, let duedate, let archived, let done):
-
-            let payload: [String: Any?] = [
-                "title": title,
-                "description": description,
-                "type": type,
-                "owner": owner,
-                "order": order,
-                "archived": archived,
-                "duedate": duedate,
-                "done": done
-            ]
-
-            return try? JSONSerialization.data(
-                withJSONObject: payload.compactMapValues { $0 }
-            )
+            return compact([
+                "title": title, "description": description, "type": type,
+                "owner": owner, "order": order, "archived": archived,
+                "duedate": duedate, "done": done
+            ])
 
         case .createBoard(let title, let hexColor):
-            let payload: [String: Any?] = [
-                "title": title,
-                "color": hexColor
-            ]
-            
-            return try? JSONSerialization.data(
-                withJSONObject: payload.compactMapValues { $0 }
-                , options: [])
+            return compact(["title": title, "color": hexColor])
 
         case .updateBoard(_, let title, let color, let archived):
-            let payload: [String: Any?] = [
-                "title": title,
-                "color": color,
-                "archived": archived
-            ]
-            
-            return try? JSONSerialization.data(
-                withJSONObject: payload.compactMapValues { $0 }
-                , options: [])
+            return compact(["title": title, "color": color, "archived": archived])
 
         case .createStack(_, let title, let order):
-            let payload: [String: Any?] = [
-                "title": title,
-                "order": order
-            ]
-            
-            return try? JSONSerialization.data(
-                withJSONObject: payload.compactMapValues { $0 }
-                , options: [])
+            return compact(["title": title, "order": order])
 
         case .updateStack(_, _, let title, let order):
-            let payload: [String: Any?] = [
-                "title": title,
-                "order": order
-            ]
-            
-            return try? JSONSerialization.data(
-                withJSONObject: payload.compactMapValues { $0 }
-                , options: [])
+            return compact(["title": title, "order": order])
 
         case .createCard(_, _, let title, let description):
-            let payload: [String: Any?] = [
-                "title": title,
-                "type": "plain",
-                "order": 999,
-                "description": description
-            ]
+            return compact(["title": title, "type": "plain", "order": 999, "description": description])
 
-            return try? JSONSerialization.data(
-                withJSONObject: payload.compactMapValues { $0 }
-            )
-
-        case .createLabel(_, title: let title, color: let color):
-            let payload: [String: Any?] = [
-                "title": title,
-                "color": color
-            ]
-            
-            return try? JSONSerialization.data(
-                withJSONObject: payload.compactMapValues { $0 }
-            )
+        case .createLabel(_, let title, let color):
+            return compact(["title": title, "color": color])
 
         case .updateLabel(_, _, let title, let color):
-            let payload: [String: Any?] = [
-                "title": title,
-                "color": color
-            ]
-            
-            return try? JSONSerialization.data(
-                withJSONObject: payload.compactMapValues { $0 }
-            )
+            return compact(["title": title, "color": color])
 
         case .assignLabel(_, _, _, let labelId), .removeLabel(_, _, _, let labelId):
-            let payload: [String: Any?] = [
-                "labelId": labelId
-            ]
-            
-            return try? JSONSerialization.data(
-                withJSONObject: payload.compactMapValues { $0 }
-            )
+            return compact(["labelId": labelId])
 
         case .assignUser(_, _, _, let userId), .unassignUser(_, _, _, let userId):
-            let payload: [String: Any?] = [
-                "userId": userId
-            ]
-
-            return try? JSONSerialization.data(
-                withJSONObject: payload.compactMapValues { $0 }
-            )
+            return compact(["userId": userId])
 
         default:
             return nil
         }
     }
-    
+
+    private func compact(_ dict: [String: Any?]) -> [String: Any] {
+        dict.compactMapValues { $0 }
+    }
+
     private var basicAuthHeader: String {
         return ValetManager.shared.basicAuthHeader
     }
