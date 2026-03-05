@@ -13,9 +13,10 @@ struct ContentView: View {
     @Environment(DeckAPI.self) private var deckAPI
     @Environment(AuthenticationManager.self) private var authManager
 
+    @AppStorage(Constants.Settings.selectedBoard) private var selectedBoard: Int?
+
     @State private var columnVisibility = NavigationSplitViewVisibility.all
 
-    @State private var selectedBoardID: Int?
     @State private var selectedStackID: Int?
     @State private var selectedCard: Card?
     @State private var showSettings = false
@@ -29,17 +30,26 @@ struct ContentView: View {
         )
     }
 
+    private var boardSelectionBinding: Binding<Int?> {
+        Binding<Int?>(
+            get: { self.selectedBoard },
+            set: { newValue in
+                self.selectedBoard = newValue
+            }
+        )
+    }
+
     var body: some View {
         Group {
             if horizontalSizeClass == .compact {
                 NavigationSplitView {
                     BoardsColumnView(
-                        selectedBoardID: $selectedBoardID,
+                        selectedBoardID: boardSelectionBinding,
                         showSettings: $showSettings
                     )
                 } content: {
                     StacksColumnView(
-                        boardID: selectedBoardID,
+                        boardID: boardSelectionBinding.wrappedValue,
                         selectedStackID: $selectedStackID
                     )
                 } detail: {
@@ -53,12 +63,12 @@ struct ContentView: View {
             } else {
                 NavigationSplitView {
                     BoardsColumnView(
-                        selectedBoardID: $selectedBoardID,
+                        selectedBoardID: boardSelectionBinding,
                         showSettings: $showSettings
                     )
                 } detail: {
                     BoardView(
-                        boardID: selectedBoardID,
+                        boardID: boardSelectionBinding.wrappedValue,
                         selectedCard: $selectedCard
                     )
                     .environment(deckAPI)

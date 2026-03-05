@@ -22,6 +22,7 @@ struct Constants {
     }
 
     struct Settings {
+        static let selectedBoard = "SelectedBoard"
         //    static let adBlock = "AdBlock"
         //    static let allowUntrustedCertificate = "AllowUntrustedCertificate"
         //    static let compactView = "CompactView"
