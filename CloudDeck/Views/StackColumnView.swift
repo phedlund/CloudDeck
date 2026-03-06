@@ -39,7 +39,6 @@ struct StackColumnView: View {
             HStack {
                 Text(stack.title)
                     .font(.headline)
-                    .padding(.horizontal)
                 Spacer()
                 Menu {
                     Button {
@@ -68,6 +67,7 @@ struct StackColumnView: View {
                     }
                     .labelStyle(.iconOnly)
                     .accentColor(.primary)
+                    .padding()
                 }
                 Button {
                     showNewCardSheet = true
@@ -81,7 +81,7 @@ struct StackColumnView: View {
                     .accentColor(.primary)
                 }
             }
-            .padding()
+            .padding(.horizontal)
 
             GeometryReader { scrollGeo in
                 ScrollView {
