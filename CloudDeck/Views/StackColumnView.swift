@@ -47,11 +47,15 @@ struct StackColumnView: View {
                         Label("Edit", systemImage: "pencil")
                     }
                     Button {
-                        //
+                        for card in cards {
+                            Task {
+                                try? await deckAPI.archiveCard(boardId: stack.boardId, stackId: stack.id, cardId: card.id)
+                            }
+                        }
                     } label: {
                         Label("Archive all cards", systemImage: "archivebox")
                     }
-                    .disabled(true)
+                    .disabled(cards.count == 0)
                     Button(role: .destructive) {
                         Task {
                             try? await deckAPI.deleteStack(boardId: stack.boardId, stackId: stack.id)

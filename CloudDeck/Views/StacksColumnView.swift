@@ -95,11 +95,11 @@ struct StacksColumnView: View {
                                             Label("Edit", systemImage: "pencil")
                                         }
                                         Button {
-                                            //
+                                            archiveCards(in: stack)
                                         } label: {
                                             Label("Archive all cards", systemImage: "archivebox")
                                         }
-                                        .disabled(true)
+                                        .disabled(isStackEmpty(stack))
                                         Button(role: .destructive) {
                                             Task {
                                                 try? await deckAPI.deleteStack(boardId: stack.boardId, stackId: stack.id)
@@ -108,7 +108,6 @@ struct StacksColumnView: View {
                                             Label("Delete", systemImage: "trash")
                                         }
                                     }
-
                             }
                             .buttonStyle(.plain)
                             .background(
@@ -204,4 +203,15 @@ struct StacksColumnView: View {
         }
     }
 
+    private func archiveCards(in stack: Stack) {
+        Task {
+            for card in stack.cards {
+                try? await deckAPI.archiveCard(boardId: stack.boardId, stackId: stack.id, cardId: card.id)
+            }
+        }
+    }
+
+    private func isStackEmpty(_ stack: Stack) -> Bool {
+        stack.cards.filter( { $0.archived == false && $0.deletedAt == nil } ).isEmpty
+    }
 }
