@@ -49,15 +49,23 @@ struct BoardView: View {
             }
         } else {
             ScrollView(.horizontal) {
-                LazyHStack(alignment: .top, spacing: 16) {
+                LazyHStack(alignment: .top, spacing: 0) {
                     ForEach(Array(stacks.enumerated()), id: \.element.id) { index, stack in
 
-                        // Vertical insertion line before each stack
-                        VerticalInsertionLine(visible: targetStackIndex == index)
+                        // Full-height drop zone + insertion line BEFORE each stack
+                        StackDropZone(visible: targetStackIndex == index)
+                            .frame(width: 24, height: stackHeight)
+                            .dropDestination(for: StackDragItem.self) { items, _ in
+                                guard let item = items.first else { return false }
+                                commitStackReorder(to: index, stackID: item.stackID)
+                                return true
+                            } isTargeted: { isTargeted in
+                                targetStackIndex = isTargeted ? index : (targetStackIndex == index ? nil : targetStackIndex)
+                            }
 
                         StackColumnView(stack: stack, onMove: handleMove, selectedCard: $selectedCard)
                             .environment(deckAPI)
-                            .frame(width: 320)
+                            .frame(width: 308) // 320 - 2*6 padding compensation
                             .opacity(draggedStack?.id == stack.id ? 0.4 : 1)
                             .background(
                                 GeometryReader { geo in
@@ -72,33 +80,11 @@ struct BoardView: View {
                                         targetStackIndex = nil
                                     }
                             }
-                            .background (
-                                GeometryReader { geo in
-                                    Color.white.opacity(0.001)
-                                        .dropDestination(for: StackDragItem.self) { items, location in
-                                            guard let item = items.first else { return false }
-                                            let insertAt = location.x < geo.size.width / 2
-                                            ? index
-                                            : index + 1
-                                            commitStackReorder(to: insertAt, stackID: item.stackID)
-                                            return true
-                                        } isTargeted: { isTargeted in
-                                            guard isTargeted else {
-                                                if targetStackIndex == index || targetStackIndex == index + 1 {
-                                                    targetStackIndex = nil
-                                                }
-                                                return
-                                            }
-                                            targetStackIndex = index
-                                        }
-                                }
-                            )
                     }
 
-                    // Trailing insertion line + drop target
-                    Color.white.opacity(0.001)
-                        .frame(width: 44, height: stackHeight)  // generous hit area
-                        .overlay(VerticalInsertionLine(visible: targetStackIndex == stacks.count))
+                    // Trailing drop zone
+                    StackDropZone(visible: targetStackIndex == stacks.count)
+                        .frame(width: 24, height: stackHeight)
                         .dropDestination(for: StackDragItem.self) { items, _ in
                             guard let item = items.first else { return false }
                             commitStackReorder(to: stacks.count, stackID: item.stackID)
@@ -108,11 +94,6 @@ struct BoardView: View {
                         }
                 }
                 .padding()
-            }
-            .dropDestination(for: StackDragItem.self) { _, _ in
-                targetStackIndex = nil
-                draggedStack = nil
-                return false
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle(boardTitle)
@@ -216,5 +197,16 @@ struct StackDragPreview: View {
             .background(.background)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .shadow(radius: 4)
+    }
+}
+
+struct StackDropZone: View {
+    let visible: Bool
+
+    var body: some View {
+        ZStack {
+            Color.white.opacity(0.001)
+            VerticalInsertionLine(visible: visible)
+        }
     }
 }
