@@ -97,16 +97,19 @@ struct StackColumnView: View {
                             CardRow(card: card)
                                 .padding(.vertical, 6)
                                 .opacity(draggedCard?.id == card.id ? 0.4 : 1)
-                                .draggable(CardDragItem(cardID: card.id)) {
-                                    CardRow(card: card)
-                                        .frame(width: 300)
-                                        .onAppear { draggedCard = card }
-                                        .onDisappear {
-                                            // Drag ended — reset regardless of how it ended
+                                .draggable(CardDragItem(cardID: card.id))
+                                .simultaneousGesture(
+                                    DragGesture(minimumDistance: 10)
+                                        .onChanged { _ in
+                                            if draggedCard?.id != card.id {
+                                                draggedCard = card
+                                            }
+                                        }
+                                        .onEnded { _ in
                                             draggedCard = nil
                                             targetIndex = nil
                                         }
-                                }
+                                )
                                 .onTapGesture {
                                     activeSheet = SheetItem(id: card.id)
                                 }
