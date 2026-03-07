@@ -72,14 +72,19 @@ struct BoardView: View {
                                     Color.clear.onAppear { stackHeight = geo.size.height }
                                 }
                             )
-                            .draggable(StackDragItem(stackID: stack.id)) {
-                                StackDragPreview(title: stack.title)
-                                    .onAppear { draggedStack = stack }
-                                    .onDisappear {
+                            .draggable(StackDragItem(stackID: stack.id))
+                            .simultaneousGesture(
+                                DragGesture(minimumDistance: 10)
+                                    .onChanged { _ in
+                                        if draggedStack?.id != stack.id {
+                                            draggedStack = stack
+                                        }
+                                    }
+                                    .onEnded { _ in
                                         draggedStack = nil
                                         targetStackIndex = nil
                                     }
-                            }
+                            )
                     }
 
                     // Trailing drop zone
@@ -183,20 +188,6 @@ struct BoardView: View {
                 try? await deckAPI.updateCard(card)
             }
         }
-    }
-}
-
-struct StackDragPreview: View {
-    let title: String
-
-    var body: some View {
-        Text(title)
-            .font(.headline)
-            .padding()
-            .frame(width: 320)
-            .background(.background)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(radius: 4)
     }
 }
 
