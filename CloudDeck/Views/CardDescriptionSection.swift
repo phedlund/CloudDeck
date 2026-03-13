@@ -43,16 +43,13 @@ struct CardDescriptionSection: View {
                     }
                 } else {
                     Button {
-                        isEditing = true
+                        editBuffer = markdownSource ?? ""
                         originalMarkdown = markdownSource
+                        isEditing = true
                     } label: {
                         Image(systemName: "pencil")
-                    }
-                }
+                    }                }
             }
-        }
-        .task {
-            editBuffer = markdownSource ?? ""
         }
     }
 }
