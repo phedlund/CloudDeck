@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D0BA9C892F305FC10057530C /* Valet in Frameworks */ = {isa = PBXBuildFile; productRef = D0BA9C882F305FC10057530C /* Valet */; };
+		D0DB1BD92F6388820078C180 /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = D0DB1BD82F6388820078C180 /* Textual */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0DB1BD92F6388820078C180 /* Textual in Frameworks */,
 				D0BA9C892F305FC10057530C /* Valet in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -84,6 +86,7 @@
 			name = CloudDeck;
 			packageProductDependencies = (
 				D0BA9C882F305FC10057530C /* Valet */,
+				D0DB1BD82F6388820078C180 /* Textual */,
 			);
 			productName = CloudDeck;
 			productReference = D0BA9BEE2F299B130057530C /* CloudDeck.app */;
@@ -115,6 +118,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				D0BA9C872F305FC10057530C /* XCRemoteSwiftPackageReference "Valet" */,
+				D0DB1BD72F6388820078C180 /* XCRemoteSwiftPackageReference "textual" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D0BA9BEF2F299B130057530C /* Products */;
@@ -395,6 +399,14 @@
 				minimumVersion = 5.0.0;
 			};
 		};
+		D0DB1BD72F6388820078C180 /* XCRemoteSwiftPackageReference "textual" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/textual";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -402,6 +414,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D0BA9C872F305FC10057530C /* XCRemoteSwiftPackageReference "Valet" */;
 			productName = Valet;
+		};
+		D0DB1BD82F6388820078C180 /* Textual */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D0DB1BD72F6388820078C180 /* XCRemoteSwiftPackageReference "textual" */;
+			productName = Textual;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

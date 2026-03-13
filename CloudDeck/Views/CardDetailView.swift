@@ -52,14 +52,10 @@ struct CardDetailView: View {
             }
             .padding(.horizontal)
             Form {
-                Section("Description") {
-                    TextEditor(text: $card.cardDescription.emptyString)
-                        .onChange(of: card.cardDescription) {
-                            scheduleDescriptionUpdate()
-                        }
-                        .frame(minHeight: 120)
-                }
-
+                CardDescriptionSection(markdownSource: $card.cardDescription)
+                    .onChange(of: card.cardDescription) {
+                        scheduleDescriptionUpdate()
+                    }
                 Section {
                     Label {
                         ChipFlowView(card.labels) { label in
