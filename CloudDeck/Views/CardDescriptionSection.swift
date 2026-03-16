@@ -35,6 +35,8 @@ struct CardDescriptionSection: View {
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                     }
+                    Spacer()
+                        .frame(width: 16)
                     Button {
                         markdownSource = editBuffer
                         isEditing = false
@@ -48,7 +50,8 @@ struct CardDescriptionSection: View {
                         isEditing = true
                     } label: {
                         Image(systemName: "pencil")
-                    }                }
+                    }
+                }
             }
         }
     }
