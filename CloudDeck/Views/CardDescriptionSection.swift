@@ -5,6 +5,7 @@
 //  Created by Peter Hedlund on 3/10/26.
 //
 
+import MDTextEditor
 import SwiftUI
 import Textual
 
@@ -14,10 +15,14 @@ struct CardDescriptionSection: View {
     @State private var editBuffer: String = ""
     @State private var originalMarkdown: String?
 
+    @State private var attributedEditBuffer: AttributedString = ""
+    @State private var selection = AttributedTextSelection()
+
+
     var body: some View {
         Section {
             if isEditing {
-                TextEditor(text: $editBuffer)
+                MDTextEditor(text: $attributedEditBuffer, selection: $selection)
                 .frame(minHeight: 200)
             } else {
                 StructuredText(markdown: markdownSource ?? "")
@@ -53,6 +58,9 @@ struct CardDescriptionSection: View {
                     }
                 }
             }
+        }
+        .task {
+            attributedEditBuffer = AttributedString(markdownSource ?? "")
         }
     }
 }

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		D0BA9C892F305FC10057530C /* Valet in Frameworks */ = {isa = PBXBuildFile; productRef = D0BA9C882F305FC10057530C /* Valet */; };
 		D0DB1BD92F6388820078C180 /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = D0DB1BD82F6388820078C180 /* Textual */; };
+		D0F528862F6C6C26007F6DDD /* MDTextEditor in Frameworks */ = {isa = PBXBuildFile; productRef = D0F528852F6C6C26007F6DDD /* MDTextEditor */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D0DB1BD92F6388820078C180 /* Textual in Frameworks */,
+				D0F528862F6C6C26007F6DDD /* MDTextEditor in Frameworks */,
 				D0BA9C892F305FC10057530C /* Valet in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -87,6 +89,7 @@
 			packageProductDependencies = (
 				D0BA9C882F305FC10057530C /* Valet */,
 				D0DB1BD82F6388820078C180 /* Textual */,
+				D0F528852F6C6C26007F6DDD /* MDTextEditor */,
 			);
 			productName = CloudDeck;
 			productReference = D0BA9BEE2F299B130057530C /* CloudDeck.app */;
@@ -119,6 +122,7 @@
 			packageReferences = (
 				D0BA9C872F305FC10057530C /* XCRemoteSwiftPackageReference "Valet" */,
 				D0DB1BD72F6388820078C180 /* XCRemoteSwiftPackageReference "textual" */,
+				D0F528842F6C6C26007F6DDD /* XCLocalSwiftPackageReference "../MDTextEditor" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D0BA9BEF2F299B130057530C /* Products */;
@@ -390,6 +394,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		D0F528842F6C6C26007F6DDD /* XCLocalSwiftPackageReference "../MDTextEditor" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../MDTextEditor;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		D0BA9C872F305FC10057530C /* XCRemoteSwiftPackageReference "Valet" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -419,6 +430,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D0DB1BD72F6388820078C180 /* XCRemoteSwiftPackageReference "textual" */;
 			productName = Textual;
+		};
+		D0F528852F6C6C26007F6DDD /* MDTextEditor */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MDTextEditor;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
