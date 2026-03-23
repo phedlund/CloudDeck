@@ -7,6 +7,7 @@
 
 import SwiftData
 import SwiftUI
+import Textual
 
 struct CardDetailView: View {
     @Bindable var card: Card
@@ -21,6 +22,8 @@ struct CardDetailView: View {
     @State private var pickedLabel: DeckLabel?
 
     @State private var showUsers = false
+
+    @State private var showDescriptionEditSheet: Bool = false
 
     @Query(filter: #Predicate<Board> { !$0.archived && $0.deletedAt == nil }, sort: \.title) private var boards: [Board]
 
@@ -52,10 +55,21 @@ struct CardDetailView: View {
             }
             .padding(.horizontal)
             Form {
-                CardDescriptionSection(markdownSource: $card.cardDescription)
-                    .onChange(of: card.cardDescription) {
-                        scheduleDescriptionUpdate()
+                Section {
+                    StructuredText(markdown: card.cardDescription ?? "")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 4)
+                } header: {
+                    HStack {
+                        Text("Description")
+                        Spacer()
+                        Button {
+                            showDescriptionEditSheet = true
+                        } label: {
+                            Image(systemName: "pencil")
+                        }
                     }
+                }
                 Section {
                     Label {
                         ChipFlowView(card.labels) { label in
@@ -228,11 +242,18 @@ struct CardDetailView: View {
                 }
 
             }
-            .onChange(of: card.title, initial: false) { _, newValue in
+            .onChange(of: card.title, initial: false) { _, _ in
                 scheduleTitleUpdate()
+            }
+            .onChange(of: card.cardDescription, initial: false) { _, _ in
+                scheduleDescriptionUpdate()
             }
         }
         .background(.background.secondary)
+        .sheet(isPresented: $showDescriptionEditSheet) {
+            DescriptionEditSheet(markdownSource: $card.cardDescription)
+                .presentationBackground(.ultraThinMaterial)
+        }
     }
 
     private func scheduleDescriptionUpdate() {
