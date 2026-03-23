@@ -12,9 +12,6 @@ import Textual
 struct CardDescriptionSection: View {
     @Binding var markdownSource: String?
     @State private var isEditing = false
-    @State private var editBuffer: String = ""
-    @State private var originalMarkdown: String?
-
     @State private var attributedEditBuffer: AttributedString = ""
     @State private var selection = AttributedTextSelection()
 
@@ -36,22 +33,20 @@ struct CardDescriptionSection: View {
                 if isEditing {
                     Button(role: .cancel) {
                         isEditing = false
-                        editBuffer = originalMarkdown ?? ""
+                        attributedEditBuffer = AttributedString(markdownSource ?? "")
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                     }
                     Spacer()
                         .frame(width: 16)
                     Button {
-                        markdownSource = editBuffer
+                        markdownSource = String(attributedEditBuffer.characters)
                         isEditing = false
                     } label: {
                         Image(systemName: "checkmark.circle.fill")
                     }
                 } else {
                     Button {
-                        editBuffer = markdownSource ?? ""
-                        originalMarkdown = markdownSource
                         isEditing = true
                     } label: {
                         Image(systemName: "pencil")
