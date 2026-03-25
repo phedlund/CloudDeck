@@ -251,7 +251,7 @@ struct CardDetailView: View {
         }
         .background(.background.secondary)
         .sheet(isPresented: $showDescriptionEditSheet) {
-            DescriptionEditSheet(markdownSource: $card.cardDescription)
+            EditDescriptionSheet(markdownSource: $card.cardDescription)
                 .presentationBackground(.ultraThinMaterial)
         }
     }

@@ -8,7 +8,7 @@
 import MDTextEditor
 import SwiftUI
 
-struct DescriptionEditSheet: View {
+struct EditDescriptionSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     @Binding var markdownSource: String?
@@ -45,5 +45,5 @@ struct DescriptionEditSheet: View {
 }
 
 #Preview {
-    DescriptionEditSheet(markdownSource: .constant(""))
+    EditDescriptionSheet(markdownSource: .constant(""))
 }
