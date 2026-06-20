@@ -23,12 +23,12 @@ struct CardDetailView: View {
     @State private var showUsers = false
 
     @Query(filter: #Predicate<Board> { !$0.archived && $0.deletedAt == nil }, sort: \.title) private var boards: [Board]
+    @Query(filter: #Predicate<DeckLabel> { _ in true }, sort: \.title) private var labels: [DeckLabel]
 
     var boardLabels: [DeckLabel] {
         if let board = boards.first( where: { $0.id == card.stack?.boardId } ) {
-            let boardLabels = board.labels
             let cardLabels = card.labels
-            let unassignedLabels = boardLabels.filter { !cardLabels.contains($0) }
+            let unassignedLabels = labels.filter { !cardLabels.contains($0) && $0.boardId == board.id }
             return unassignedLabels
         }
         return []
@@ -38,8 +38,8 @@ struct CardDetailView: View {
         if let board = boards.first( where: { $0.id == card.stack?.boardId } ) {
             let users = board.users
             let cardUsers = card.assignedUsers.map { $0.user.uid }
-
-            return users.filter { !cardUsers.contains($0.uid) }
+            let unassignedUsers = board.users.filter { !cardUsers.contains($0.uid) }
+            return users.filter { !unassignedUsers.contains($0) }
         }
         return []
     }

@@ -179,6 +179,7 @@ extension Board {
         let stackModels = dto.stacks.map { Stack(dto: $0) }
         let userModels = dto.users.map { User(dto: $0) }
         let aclModels = dto.acl.map { ACLItem(dto: $0) }
+        let labelModels = dto.labels.map { DeckLabel(dto: $0) }
 
         title = dto.title
         color = dto.color
@@ -196,5 +197,6 @@ extension Board {
 //        settings = BoardSettings(notifyDue: dto.settings["notify-due"],
 //                                 calendar: dto.settings["calendar"])
         acl = aclModels
+        labels = labelModels
     }
 }
